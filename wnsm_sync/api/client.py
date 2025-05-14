@@ -84,6 +84,12 @@ class Smartmeter:
                 },
                 allow_redirects=False,
             )
+            # 🔍 DEBUG STAGE 1: After first login step
+            print("🔍 Stage 1: Initial login POST")
+            print("→ Status:", result.status_code)
+            print("→ Redirect headers:", result.headers)
+            print("→ Content preview:", result.text[:300])
+
             tree = html.fromstring(result.content)
             action = tree.xpath("(//form/@action)")[0]
 
@@ -95,7 +101,15 @@ class Smartmeter:
                 },
                 allow_redirects=False,
             )
+
+            # 🔍 DEBUG STAGE 2: After password step
+            print("🔍 Stage 2: Password form POST")
+            print("→ Status:", result.status_code)
+            print("→ Headers:", result.headers)
+            print("→ Location:", result.headers.get("Location", "MISSING"))
+
         except Exception as exception:
+            print("❌ Exception occurred:", str(exception))
             raise SmartmeterConnectionError(
                 "Could not login with credentials"
             ) from exception
@@ -114,6 +128,7 @@ class Smartmeter:
             ]
         )
         if "code" not in fragment_dict:
+            print("❌ Fragment parsing failed. Full location:", location)
             raise SmartmeterLoginError(
                 "Login failed. Could not extract 'code' from 'Location'"
             )
