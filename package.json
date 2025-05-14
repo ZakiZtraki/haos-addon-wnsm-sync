@@ -1,0 +1,24 @@
+{
+  "name": "homeassistant-addon-wnsm-sync",
+  "version": "1.0.0",
+  "description": "This Home Assistant add-on fetches 15-minute interval consumption data from the Wiener Netze Smart Meter portal and injects it into Home Assistant's long-term statistics.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release": "standard-version"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/issues"
+  },
+  "homepage": "https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync#readme",
+  "devDependencies": {
+    "standard-version": "^9.5.0"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "packageFiles": [
+    {
+      "filename": "config.json",
+      "type": "json"
+    }
+  ],
+  "bumpFiles": [
+    {
+      "filename": "config.json",
+      "type": "json"
+    }
+  ],
+  "skip": {
+    "tag": false
+  }
+}
