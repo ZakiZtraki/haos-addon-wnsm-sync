@@ -1,5 +1,7 @@
 import sys
+print("==== Add-on starting up ====")
 import os
+print("Using username:", os.getenv("WNSM_USERNAME"))
 import json
 import requests
 from datetime import datetime, timedelta

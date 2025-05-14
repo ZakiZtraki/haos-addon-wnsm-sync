@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+echo "Starting sync via run.sh..."
+
 export WNSM_USERNAME="$WNSM_USERNAME"
 export WNSM_PASSWORD="$WNSM_PASSWORD"
 export WNSM_GP="$WNSM_GP"
