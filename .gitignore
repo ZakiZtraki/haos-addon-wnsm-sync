@@ -10,3 +10,35 @@
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+# Node.js
+node_modules/
+npm-debug.log
+package-lock.json
+
+# Python virtual environments and bytecode
+*.pyc
+__pycache__/
+.venv/
+.env
+.env.*
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Home Assistant
+home-assistant.log
+secrets.yaml
+*.db
+*.sqlite3
+
+# Docker build output (if manually built)
+*.tar
+*.img
+*.gz
+
+# Add-on generated files
+CHANGELOG.md
