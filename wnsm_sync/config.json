@@ -28,6 +28,6 @@
         "HA_URL": "str",
         "STAT_ID": "str"
     },
-    "image": "local/wnsm_sync",
+    "build": true,
     "udev": true
 }
