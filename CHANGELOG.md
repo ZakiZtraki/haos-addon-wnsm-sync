@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.4](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.3...v1.2.4) (2025-05-16)
+
+
+### Bug Fixes
+
+* dynamically build form data for login in Smartmeter client ([dac7c74](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/dac7c746161c4998793276b3033959acf0f9e092))
+* enhance environment variable handling and debug output in sync script ([2ba8544](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/2ba8544f386803f2f49b87faba18d0249846b7ab))
+
 ### [1.2.3](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.2...v1.2.3) (2025-05-16)
 
 
