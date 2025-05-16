@@ -12,12 +12,12 @@ export HA_URL="$HA_URL"
 export STAT_ID="$STAT_ID"
 
 # Debug the environment before running the script
-echo "DEBUG: Username: $WNSM_USERNAME"
-echo "DEBUG: Password length: ${#WNSM_PASSWORD}"
-echo "DEBUG: GP: $WNSM_GP"
-echo "DEBUG: ZP: $WNSM_ZP"
-echo "DEBUG: HA_URL: $HA_URL"
-echo "DEBUG: STAT_ID: $STAT_ID"
+echo "DEBUG: Username: ${WNSM_USERNAME}"
+echo "DEBUG: Password length: #{${WNSM_PASSWORD}}"
+echo "DEBUG: GP: ${WNSM_GP}"
+echo "DEBUG: ZP: ${WNSM_ZP}"
+echo "DEBUG: HA_URL: ${HA_URL}"
+echo "DEBUG: STAT_ID: ${STAT_ID}"
 
 # Forward signals to the Python process
 _term() {
