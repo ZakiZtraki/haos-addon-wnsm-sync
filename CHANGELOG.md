@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.5](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.1.4...v1.1.5) (2025-05-16)
+
+
+### Bug Fixes
+
+* correct 'map' field with named environment bindings ([7b69fcb](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/7b69fcb0db9b79e11f5ee4428d1988aac37dbaaf))
+
 ### [1.1.4](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.1.3...v1.1.4) (2025-05-16)
 
 

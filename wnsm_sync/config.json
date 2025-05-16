@@ -1,6 +1,6 @@
 {
     "name": "Wiener Netze Smartmeter Sync",
-    "version": "1.1.4",
+    "version": "1.1.5",
     "slug": "wnsm_sync",
     "description": "Fetches 15-min smart meter data and pushes to Home Assistant statistics.",
     "arch": [
@@ -33,13 +33,34 @@
         "STAT_ID": "str"
     },
     "map": [
-        { "config": "WNSM_USERNAME", "name": "WNSM_USERNAME" },
-        { "config": "WNSM_PASSWORD", "name": "WNSM_PASSWORD" },
-        { "config": "WNSM_GP", "name": "WNSM_GP" },
-        { "config": "WNSM_ZP", "name": "WNSM_ZP" },
-        { "config": "HA_TOKEN", "name": "HA_TOKEN" },
-        { "config": "HA_URL", "name": "HA_URL" },
-        { "config": "STAT_ID", "name": "STAT_ID" }
+        {
+            "config": "WNSM_USERNAME",
+            "name": "WNSM_USERNAME"
+        },
+        {
+            "config": "WNSM_PASSWORD",
+            "name": "WNSM_PASSWORD"
+        },
+        {
+            "config": "WNSM_GP",
+            "name": "WNSM_GP"
+        },
+        {
+            "config": "WNSM_ZP",
+            "name": "WNSM_ZP"
+        },
+        {
+            "config": "HA_TOKEN",
+            "name": "HA_TOKEN"
+        },
+        {
+            "config": "HA_URL",
+            "name": "HA_URL"
+        },
+        {
+            "config": "STAT_ID",
+            "name": "STAT_ID"
+        }
     ],
     "environment": {
         "WNSM_USERNAME": "WNSM_USERNAME",
