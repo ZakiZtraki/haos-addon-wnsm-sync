@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.7](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.6...v1.2.7) (2025-05-16)
+
+
+### Bug Fixes
+
+* update date handling in bewegungsdaten retrieval ([b1d073b](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/b1d073baad151674fab1dbe686f79e603c615130))
+
 ### [1.2.6](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.5...v1.2.6) (2025-05-16)
 
 
