@@ -1,6 +1,6 @@
 {
     "name": "Wiener Netze Smartmeter Sync",
-    "version": "1.2.5",
+    "version": "1.2.6",
     "slug": "wnsm_sync",
     "description": "Fetches 15-min smart meter data and pushes to Home Assistant statistics.",
     "arch": [
