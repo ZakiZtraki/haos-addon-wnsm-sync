@@ -2,6 +2,7 @@ import sys
 print("==== Add-on starting up ====")
 import os
 print("Using username:", os.getenv("WNSM_USERNAME"))
+print("Password set?:", "YES" if os.getenv("WNSM_PASSWORD") else "NO")
 import json
 import requests
 from datetime import datetime, timedelta
