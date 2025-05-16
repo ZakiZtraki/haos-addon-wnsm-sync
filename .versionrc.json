@@ -1,13 +1,13 @@
 {
   "packageFiles": [
     {
-      "filename": "config.json",
+      "filename": "wnsm_sync/config.json",
       "type": "json"
     }
   ],
   "bumpFiles": [
     {
-      "filename": "config.json",
+      "filename": "wnsm_sync/config.json",
       "type": "json"
     }
   ],
