@@ -32,45 +32,7 @@
         "HA_URL": "str",
         "STAT_ID": "str"
     },
-    "map": [
-        {
-            "config": "WNSM_USERNAME",
-            "name": "WNSM_USERNAME"
-        },
-        {
-            "config": "WNSM_PASSWORD",
-            "name": "WNSM_PASSWORD"
-        },
-        {
-            "config": "WNSM_GP",
-            "name": "WNSM_GP"
-        },
-        {
-            "config": "WNSM_ZP",
-            "name": "WNSM_ZP"
-        },
-        {
-            "config": "HA_TOKEN",
-            "name": "HA_TOKEN"
-        },
-        {
-            "config": "HA_URL",
-            "name": "HA_URL"
-        },
-        {
-            "config": "STAT_ID",
-            "name": "STAT_ID"
-        }
-    ],
-    "environment": {
-        "WNSM_USERNAME": "WNSM_USERNAME",
-        "WNSM_PASSWORD": "WNSM_PASSWORD",
-        "WNSM_GP": "WNSM_GP",
-        "WNSM_ZP": "WNSM_ZP",
-        "HA_TOKEN": "HA_TOKEN",
-        "HA_URL": "HA_URL",
-        "STAT_ID": "STAT_ID"
-    },
     "build": true,
-    "udev": true
+    "udev": true,
+    "url": "https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync"
 }
