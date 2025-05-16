@@ -33,13 +33,13 @@
         "STAT_ID": "str"
     },
     "map": [
-        "config:WNSM_USERNAME",
-        "config:WNSM_PASSWORD",
-        "config:WNSM_GP",
-        "config:WNSM_ZP",
-        "config:HA_TOKEN",
-        "config:HA_URL",
-        "config:STAT_ID"
+        { "config": "WNSM_USERNAME" },
+        { "config": "WNSM_PASSWORD" },
+        { "config": "WNSM_GP" },
+        { "config": "WNSM_ZP" },
+        { "config": "HA_TOKEN" },
+        { "config": "HA_URL" },
+        { "config": "STAT_ID" }
     ],
     "environment": {
         "WNSM_USERNAME": "WNSM_USERNAME",
