@@ -618,6 +618,8 @@ class Smartmeter:
             query=query,
             extra_headers=extra,
         )
+        print("🔍 Raw response from bewegungsdaten endpoint:")
+        print(json.dumps(data, indent=2))
         if data["descriptor"]["zaehlpunktnummer"] != zaehlpunkt:
             raise SmartmeterQueryError("Returned data does not match given zaehlpunkt!")
         return data
