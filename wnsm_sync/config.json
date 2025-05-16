@@ -32,6 +32,15 @@
         "HA_URL": "str",
         "STAT_ID": "str"
     },
+    "environment": {
+        "WNSM_USERNAME": "WNSM_USERNAME",
+        "WNSM_PASSWORD": "WNSM_PASSWORD",
+        "WNSM_GP": "WNSM_GP",
+        "WNSM_ZP": "WNSM_ZP",
+        "HA_TOKEN": "HA_TOKEN",
+        "HA_URL": "HA_URL",
+        "STAT_ID": "STAT_ID"
+},
     "build": true,
     "udev": true
 }
