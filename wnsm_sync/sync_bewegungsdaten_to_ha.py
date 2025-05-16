@@ -39,7 +39,7 @@ from api.client import Smartmeter
 client = Smartmeter(username, password)
 client.login()
 
-yesterday = datetime.now(datetime.timezone.utc).date() - timedelta(days=1)
+yesterday = datetime.utcnow().date() - timedelta(days=1)
 from_ts = datetime.combine(yesterday, datetime.min.time()).isoformat() + "Z"
 to_ts = datetime.combine(yesterday, datetime.max.time()).isoformat() + "Z"
 
