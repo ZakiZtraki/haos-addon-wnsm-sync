@@ -20,5 +20,8 @@
   "homepage": "https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync#readme",
   "devDependencies": {
     "standard-version": "^9.5.0"
+  },
+  "standard-version": {
+  "changelogFile": "wnsm_sync/CHANGELOG.md"
   }
 }
