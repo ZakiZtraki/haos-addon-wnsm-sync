@@ -5,7 +5,7 @@ echo "Starting sync via run.sh..."
 
 # Debug the environment before running the script
 echo "DEBUG: Username: ${WNSM_USERNAME}"
-echo "DEBUG: Password length: ${#WNSM_PASSWORD}}"
+echo "DEBUG: Password length: ${#WNSM_PASSWORD}"
 echo "DEBUG: GP: ${WNSM_GP}"
 echo "DEBUG: ZP: ${WNSM_ZP}"
 echo "DEBUG: HA_URL: ${HA_URL}"
