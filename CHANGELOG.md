@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.1.0...v1.1.1) (2025-05-16)
+
+
+### Bug Fixes
+
+* map HA config options to container environment variables ([c489d9d](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/c489d9d2716633db89e5dabf1edb95c62ae0999a))
+
 ## [1.1.0](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.0.3...v1.1.0) (2025-05-16)
 
 
