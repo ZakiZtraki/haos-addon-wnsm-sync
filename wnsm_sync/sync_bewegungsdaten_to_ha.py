@@ -43,12 +43,16 @@ yesterday = datetime.utcnow().date() - timedelta(days=1)
 from_ts = datetime.combine(yesterday, datetime.min.time()).isoformat() + "Z"
 to_ts = datetime.combine(yesterday, datetime.max.time()).isoformat() + "Z"
 
-bewegungsdaten = client.get_bewegungsdaten(
-    GP,
-    ZP,
-    from_ts,
-    to_ts,
-    "V002"
+from datetime import date
+
+date_from = datetime.fromisoformat(from_ts.replace("Z", "")).date()
+date_until = datetime.fromisoformat(to_ts.replace("Z", "")).date()
+
+bewegungsdaten = client.bewegungsdaten(
+    zaehlpunktnummer=ZP,
+    date_from=date_from,
+    date_until=date_until,
+    aggregat="V002"
 )
 
 # === Prepare Data for HA REST API ===
