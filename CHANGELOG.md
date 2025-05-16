@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.4](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.1.3...v1.1.4) (2025-05-16)
+
+
+### Bug Fixes
+
+* correct map format for Supervisor env injection ([8395c52](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/8395c527fe248fa472c971ebe6f556b58b876a11))
+
 ### [1.1.3](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.1.2...v1.1.3) (2025-05-16)
 
 
