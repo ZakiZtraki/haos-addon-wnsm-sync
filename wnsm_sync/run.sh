@@ -3,14 +3,6 @@ set -e
 
 echo "Starting sync via run.sh..."
 
-# Debug the environment before running the script
-echo "DEBUG: Username: ${WNSM_USERNAME}"
-echo "DEBUG: Password length: ${#WNSM_PASSWORD}"
-echo "DEBUG: GP: ${WNSM_GP}"
-echo "DEBUG: ZP: ${WNSM_ZP}"
-echo "DEBUG: HA_URL: ${HA_URL}"
-echo "DEBUG: STAT_ID: ${STAT_ID}"
-
 # Forward signals to the Python process
 _term() {
     echo "Caught SIGTERM, forwarding to child"
@@ -23,3 +15,11 @@ trap _term SIGTERM SIGINT
 python3 /app/sync_bewegungsdaten_to_ha.py &
 child=$!
 wait "$child"
+
+# Debug the environment before running the script
+echo "DEBUG: Username: ${WNSM_USERNAME}"
+echo "DEBUG: Password length: ${#WNSM_PASSWORD}"
+echo "DEBUG: GP: ${WNSM_GP}"
+echo "DEBUG: ZP: ${WNSM_ZP}"
+echo "DEBUG: HA_URL: ${HA_URL}"
+echo "DEBUG: STAT_ID: ${STAT_ID}"
