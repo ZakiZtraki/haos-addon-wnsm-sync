@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.2](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.1...v1.2.2) (2025-05-16)
+
+
+### Bug Fixes
+
+* removed env var exports for home assistant ([0176385](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/0176385e24436039bae89c66543c9cef3748b6e5))
+
 ### [1.2.1](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.0...v1.2.1) (2025-05-16)
 
 
