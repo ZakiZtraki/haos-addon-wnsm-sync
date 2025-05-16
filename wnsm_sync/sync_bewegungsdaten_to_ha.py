@@ -36,7 +36,7 @@ if not all([USERNAME, PASSWORD, GP, ZP, HA_URL, HA_TOKEN, STATISTIC_ID]):
 from api.client import Smartmeter
 
 # === Login & Data Fetch ===
-client = Smartmeter(USERNAME, PASSWORD)
+client = Smartmeter(username, password)
 client.login()
 
 yesterday = datetime.now(datetime.timezone.utc).date() - timedelta(days=1)
