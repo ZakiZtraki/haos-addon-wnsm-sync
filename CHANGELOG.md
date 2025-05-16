@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.1.6...v1.2.0) (2025-05-16)
+
+
+### Features
+
+* enhance run.sh with environment variable exports and debugging information ([9de4157](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/9de4157c089e0b891307ed83c88ca6e21643e4b2))
+
 ### [1.1.6](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.1.5...v1.1.6) (2025-05-16)
 
 ### [1.1.5](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.1.4...v1.1.5) (2025-05-16)
