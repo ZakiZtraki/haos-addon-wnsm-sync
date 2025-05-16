@@ -91,14 +91,22 @@ class Smartmeter:
             print("→ Content preview:", result.text[:300])
 
             tree = html.fromstring(result.content)
-            action = tree.xpath("(//form/@action)")[0]
+            form_inputs = tree.xpath("//form//input[@name]")
+            print("→ Stage 1 form fields:", [el.attrib.get('name') for el in form_inputs])
+
+            # Build form data dynamically
+            form_data = {el.attrib['name']: el.attrib.get('value', '') for el in form_inputs}
+            if 'username' in form_data:
+                form_data['username'] = self.username
+            if 'password' in form_data:
+                form_data['password'] = self.password
+            print("→ Filled form data:", form_data)
+
+            action = tree.xpath("(//form/@action)")[0]  # Existing
 
             result = self.session.post(
                 action,
-                data={
-                    "username": self.username,
-                    "password": self.password,
-                },
+                data=form_data,
                 allow_redirects=False,
             )
 
