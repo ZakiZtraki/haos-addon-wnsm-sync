@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.23](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.22...v1.2.23) (2025-05-17)
+
+
+### Bug Fixes
+
+* switch to supervisor token and internal HA URL for authorized statistics upload ([75601bf](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/75601bf32e9310c2cd5facb0d916d21d89dd2937))
+* uncommented changelog copy command ([29447e6](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/29447e6f46c0a82da3eba600761fc03470d00758))
+
 ### [1.2.22](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.21...v1.2.22) (2025-05-17)
 
 
