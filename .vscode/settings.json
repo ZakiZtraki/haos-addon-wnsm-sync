@@ -23,5 +23,8 @@
         "zaehlwerke",
         "ZEITPUNKT",
         "ZEITSPANNE"
-    ]
+    ],
+    "files.associations": {
+        "*.yaml": "home-assistant"
+    }
 }
