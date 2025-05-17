@@ -12,7 +12,7 @@ PASSWORD = os.getenv("WNSM_PASSWORD")
 GP = os.getenv("WNSM_GP")
 ZP = os.getenv("WNSM_ZP")
 HA_URL = os.getenv("HA_URL")
-HA_TOKEN = os.getenv("HASSIO_TOKEN")
+HA_TOKEN = os.getenv("HA_TOKEN")
 STATISTIC_ID = os.getenv("STAT_ID", "sensor.wiener_netze_energy")
 
 print("Using username:", os.getenv("WNSM_USERNAME"))
