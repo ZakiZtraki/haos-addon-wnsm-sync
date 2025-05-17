@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.1](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.4.0...v1.4.1) (2025-05-17)
+
+
+### Bug Fixes
+
+* update default MQTT host to core-mosquitto ([02917f4](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/02917f43036be5fe299dd1594685cad5a0f896ca))
+
 ## [1.4.0](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.3.0...v1.4.0) (2025-05-17)
 
 
