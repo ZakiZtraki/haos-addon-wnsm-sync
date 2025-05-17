@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.37...v1.3.0) (2025-05-17)
+
+
+### Features
+
+* publish each QH reading to unique MQTT topic for full-day retention and cost tracking ([76900e2](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/76900e2e6f9a3d4db5e6f9f681714e1bba2a6a70))
+
 ### [1.2.37](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.36...v1.2.37) (2025-05-17)
 
 
