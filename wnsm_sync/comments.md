@@ -12,17 +12,17 @@ Here's how we should modify the MQTT sensor configuration to handle this use cas
 publish.single(
     topic="homeassistant/sensor/wnsm/energy/config",
     payload=json.dumps({
-        "name": "Wiener Netze Energy",
+        "name": "Wiener Netze Smart Meter Sync",
         "device_class": "energy",
         "state_class": "total_increasing",
         "unit_of_measurement": "kWh",
         "state_topic": MQTT_TOPIC,
-        "unique_id": "wn_energy_sensor",
+        "unique_id": "wnsm_sync",
         "value_template": "{{ value_json.value }}",
         "timestamp_template": "{{ value_json.timestamp }}",  # Add timestamp template
         "device": {
-            "identifiers": ["wnsm_smartmeter"],
-            "name": "Wiener Netze Smart Meter",
+            "identifiers": ["wnsm_sync"],
+            "name": "Wiener Netze Smart Meter Sync",
             "manufacturer": "Wiener Netze",
             "model": "Smart Meter"
         }
