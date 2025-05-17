@@ -70,7 +70,7 @@ for entry in bewegungsdaten["values"]:
     })
 
 metadata = {
-    "statistic_id": STATISTIC_ID,
+    "statistic_id": stat_id,
     "unit_of_measurement": "kWh",
     "has_mean": False,
     "has_sum": True,
@@ -84,18 +84,22 @@ payload = [{
 }]
 
 headers = {
-    "Authorization": f"Bearer {HA_TOKEN}",
+    "Authorization": f"Bearer {ha_token}",
     "Content-Type": "application/json"
 }
 
-if not HA_URL or not STATISTIC_ID:
-    print(f"❌ Cannot post: HA_URL or STAT_ID is missing — HA_URL={HA_URL}, STAT_ID={STATISTIC_ID}")
+if not HA_URL or not stat_id:
+    print(f"❌ Cannot post: HA_URL or STAT_ID is missing — HA_URL={ha_url}, STAT_ID={stat_id}")
     sys.exit(1)
 
 
 print(f"🔍 Uploading {len(statistics)} entries to {HA_URL}/api/recorder/statistics")
 
-resp = requests.post(f"{HA_URL}/api/recorder/statistics", headers=headers, data=json.dumps(payload))
+print(f"🔍 Final HA_URL: {ha_url}")
+print(f"🔍 Final STAT_ID: {stat_id}")
+print(f"🔍 Final Token present?: {'Yes' if ha_token else 'No'}")
+
+resp = requests.post(f"{ha_url}/api/recorder/statistics", headers=headers, data=json.dumps(payload))
 
 if resp.status_code == 200:
     print("✅ Data uploaded to Home Assistant successfully.")

@@ -26,3 +26,6 @@ if [ -z "$WNSM_USERNAME" ]; then
     export HA_URL=$(jq -r '.HA_URL' /data/options.json)
     export STAT_ID=$(jq -r '.STAT_ID' /data/options.json)
 fi
+
+echo "[DEBUG] HA_URL=$HA_URL"
+echo "[DEBUG] STAT_ID=$STAT_ID"
