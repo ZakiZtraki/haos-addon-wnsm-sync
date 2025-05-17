@@ -84,7 +84,7 @@ payload = [{
 }]
 
 headers = {
-    "Authorization": f"Bearer {ha_token}",
+    "Authorization": f"Bearer {os.getenv('SUPERVISOR_TOKEN')}",
     "Content-Type": "application/json"
 }
 
