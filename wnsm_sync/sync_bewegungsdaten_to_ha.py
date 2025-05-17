@@ -5,6 +5,7 @@ import json
 import requests
 from datetime import datetime, timedelta
 from decimal import Decimal
+import paho.mqtt.publish as publish
 
 # === CONFIGURATION ===
 USERNAME = os.getenv("WNSM_USERNAME")
@@ -14,6 +15,8 @@ ZP = os.getenv("WNSM_ZP")
 HA_URL = os.getenv("HA_URL", "http://homeassistant:8123")
 HA_TOKEN = os.getenv("SUPERVISOR_TOKEN") or os.getenv("HASSIO_TOKEN") or os.getenv("HA_TOKEN")
 STATISTIC_ID = os.getenv("STAT_ID", "sensor.wiener_netze_energy")
+MQTT_HOST = os.getenv("MQTT_HOST", "homeassistant")
+MQTT_TOPIC = os.getenv("MQTT_TOPIC", "smartmeter/energy/state")
 
 print("Using username:", os.getenv("WNSM_USERNAME"))
 print("Password set?:", "YES" if os.getenv("WNSM_PASSWORD") else "NO")
@@ -62,13 +65,13 @@ bewegungsdaten = client.bewegungsdaten(
     aggregat="NONE"
 )
 
-# === Prepare Data for HA REST API ===
+# === Prepare and publish via MQTT ===
 total = Decimal(0)
 statistics = []
 
 for entry in bewegungsdaten["values"]:
     ts = datetime.fromisoformat(entry["zeitpunktVon"].replace("Z", "+00:00"))
-    value_kwh = Decimal(str(entry["wert"]))  # Ensure proper Decimal conversion
+    value_kwh = Decimal(str(entry["wert"]))
     total += value_kwh
     statistics.append({
         "start": ts.isoformat(),
@@ -76,41 +79,19 @@ for entry in bewegungsdaten["values"]:
         "state": float(value_kwh)
     })
 
-metadata = {
-    "statistic_id": STATISTIC_ID,
-    "unit_of_measurement": "kWh",
-    "has_mean": False,
-    "has_sum": True,
-    "name": "WienerNetze Energy",
-    "source": "integration"
-}
+print(f"🔍 Publishing {len(statistics)} entries to MQTT topics under '{MQTT_TOPIC}/<timestamp>'")
 
-payload = [{
-    "metadata": metadata,
-    "data": statistics
-}]
+for s in statistics:
+    topic = f"{MQTT_TOPIC}/{s['start'][:16]}"  # e.g. smartmeter/energy/state/2025-05-16T00:15
+    payload = {
+        "value": s["sum"],
+        "timestamp": s["start"]
+    }
+    publish.single(
+        topic,
+        payload=json.dumps(payload),
+        hostname=MQTT_HOST,
+        retain=True
+    )
 
-headers = {
-    "Authorization": f"Bearer {HA_TOKEN}",
-    "Content-Type": "application/json"
-}
-
-print("🔍 Final headers:", headers)
-
-if not HA_URL or not STATISTIC_ID:
-    print(f"❌ Cannot post: HA_URL or STAT_ID is missing — HA_URL={HA_URL}, STAT_ID={STATISTIC_ID}")
-    sys.exit(1)
-
-
-print(f"🔍 Uploading {len(statistics)} entries to {HA_URL}/api/recorder/statistics")
-
-print(f"🔍 Final HA_URL: {HA_URL}")
-print(f"🔍 Final STAT_ID: {STATISTIC_ID}")
-print(f"🔍 Final Token present?: {'Yes' if HA_TOKEN else 'No'}")
-
-resp = requests.post(f"{HA_URL}/api/recorder/statistics", headers=headers, data=json.dumps(payload))
-
-if resp.status_code == 200:
-    print("✅ Data uploaded to Home Assistant successfully.")
-else:
-    print(f"❌ Upload failed: {resp.status_code} — {resp.text}")
+print("✅ All entries published to MQTT.")
