@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.35](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.34...v1.2.35) (2025-05-17)
+
+
+### Bug Fixes
+
+* correct environment variable handling and output in run.sh and sync_bewegungsdaten_to_ha.py ([94c2059](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/94c20593713143d63cbbcbf67f08ca4df5dde13f))
+
 ### [1.2.34](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.33...v1.2.34) (2025-05-17)
 
 ### [1.2.33](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.32...v1.2.33) (2025-05-17)
