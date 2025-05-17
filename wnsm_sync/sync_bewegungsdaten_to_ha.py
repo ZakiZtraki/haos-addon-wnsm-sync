@@ -91,7 +91,7 @@ payload = [{
 }]
 
 headers = {
-    "Authorization": f"Bearer {os.getenv('HA_TOKEN')}",
+    "Authorization": f"Bearer {HA_TOKEN}",
     "Content-Type": "application/json"
 }
 
