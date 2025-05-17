@@ -12,7 +12,7 @@ PASSWORD = os.getenv("WNSM_PASSWORD")
 GP = os.getenv("WNSM_GP")
 ZP = os.getenv("WNSM_ZP")
 HA_URL = os.getenv("HA_URL", "http://haos.local:8123")
-HA_TOKEN = os.getenv("HA_TOKEN")
+HA_TOKEN = os.getenv("HASSIO_TOKEN")
 STATISTIC_ID = os.getenv("STAT_ID", "sensor.wiener_netze_energy")
 
 print("Using username:", os.getenv("WNSM_USERNAME"))
@@ -29,7 +29,7 @@ if not all([USERNAME, PASSWORD, GP, ZP, HA_URL, HA_TOKEN, STATISTIC_ID]):
     zp = opts.get("WNSM_ZP", ZP)
     ha_url = opts.get("HA_URL", HA_URL)
     stat_id = opts.get("STAT_ID", STATISTIC_ID)
-    ha_token = opts.get("HA_TOKEN", HA_TOKEN)
+    ha_token = os.getenv("SUPERVISOR_TOKEN", HA_TOKEN)
     print("Using username:", username)
     print("Password set?:", "YES" if password else "NO")
 
@@ -84,7 +84,7 @@ payload = [{
 }]
 
 headers = {
-    "Authorization": f"Bearer {os.getenv('SUPERVISOR_TOKEN')}",
+    "Authorization": f"Bearer {os.getenv('ha_token')}",
     "Content-Type": "application/json"
 }
 
