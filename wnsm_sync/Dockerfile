@@ -2,6 +2,9 @@ FROM python:3.12.10-slim
 
 WORKDIR /app
 
+# Install jq for JSON parsing
+RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/*
+
 # Install required Python packages
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
