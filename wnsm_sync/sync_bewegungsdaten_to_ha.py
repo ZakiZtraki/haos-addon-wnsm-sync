@@ -90,7 +90,7 @@ headers = {
 
 print("🔍 Final headers:", headers)
 
-if not HA_URL or not stat_id:
+if not ha_url or not stat_id:
     print(f"❌ Cannot post: HA_URL or STAT_ID is missing — HA_URL={ha_url}, STAT_ID={stat_id}")
     sys.exit(1)
 
