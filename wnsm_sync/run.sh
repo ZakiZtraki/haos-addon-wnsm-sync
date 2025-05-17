@@ -22,7 +22,6 @@ if [ -z "$WNSM_USERNAME" ]; then
     export WNSM_PASSWORD=$(jq -r '.WNSM_PASSWORD' /data/options.json)
     export WNSM_GP=$(jq -r '.WNSM_GP' /data/options.json)
     export WNSM_ZP=$(jq -r '.WNSM_ZP' /data/options.json)
-    export HA_TOKEN=$(jq -r '.HA_TOKEN' /data/options.json)
     export HA_URL=$(jq -r '.HA_URL' /data/options.json)
     export STAT_ID=$(jq -r '.STAT_ID' /data/options.json)
 fi
