@@ -26,6 +26,6 @@
     "standard-version": "^9.5.0"
   },
   "standard-version": {
-  "changelogFile": "./wnsm_sync/CHANGELOG.md"
+    "changelogFile": "./wnsm_sync/CHANGELOG.md"
   }
 }
