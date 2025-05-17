@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.30](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.29...v1.2.30) (2025-05-17)
+
+
+### Bug Fixes
+
+* add HA_TOKEN export in run.sh for environment variable loading ([14080c4](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/14080c4a750aeba619f31ccdd889ec160cc7c481))
+
 ### [1.2.29](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.28...v1.2.29) (2025-05-17)
 
 
