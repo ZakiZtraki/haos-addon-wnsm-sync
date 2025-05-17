@@ -17,6 +17,8 @@ HA_TOKEN = os.getenv("SUPERVISOR_TOKEN") or os.getenv("HASSIO_TOKEN") or os.gete
 STATISTIC_ID = os.getenv("STAT_ID", "sensor.wiener_netze_energy")
 MQTT_HOST = os.getenv("MQTT_HOST", "homeassistant")
 MQTT_TOPIC = os.getenv("MQTT_TOPIC", "smartmeter/energy/state")
+MQTT_USERNAME = os.getenv("MQTT_USERNAME")
+MQTT_PASSWORD = os.getenv("MQTT_PASSWORD")
 
 print("Using username:", os.getenv("WNSM_USERNAME"))
 print("Password set?:", "YES" if os.getenv("WNSM_PASSWORD") else "NO")
@@ -40,6 +42,8 @@ if not all([USERNAME, PASSWORD, GP, ZP, HA_URL, HA_TOKEN, STATISTIC_ID]):
     HA_URL = opts.get("HA_URL", HA_URL)
     STATISTIC_ID = opts.get("STAT_ID", STATISTIC_ID)
     HA_TOKEN = os.getenv("SUPERVISOR_TOKEN", HA_TOKEN)
+    MQTT_USERNAME = opts.get("MQTT_USERNAME", MQTT_USERNAME)
+    MQTT_PASSWORD = opts.get("MQTT_PASSWORD", MQTT_PASSWORD)
     print("Using username:", USERNAME)
     print("Password set?:", "YES" if PASSWORD else "NO")
 
@@ -91,6 +95,10 @@ for s in statistics:
         topic,
         payload=json.dumps(payload),
         hostname=MQTT_HOST,
+        auth={
+            "username": MQTT_USERNAME,
+            "password": MQTT_PASSWORD
+        },
         retain=True
     )
 
