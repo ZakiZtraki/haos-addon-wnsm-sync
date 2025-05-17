@@ -11,7 +11,7 @@ USERNAME = os.getenv("WNSM_USERNAME")
 PASSWORD = os.getenv("WNSM_PASSWORD")
 GP = os.getenv("WNSM_GP")
 ZP = os.getenv("WNSM_ZP")
-HA_URL = os.getenv("HA_URL")
+HA_URL = os.getenv("HA_URL", "http://supervisor/core")
 HA_TOKEN = os.getenv("SUPERVISOR_TOKEN") or os.getenv("HASSIO_TOKEN") or os.getenv("HA_TOKEN")
 STATISTIC_ID = os.getenv("STAT_ID", "sensor.wiener_netze_energy")
 
@@ -91,7 +91,7 @@ payload = [{
 }]
 
 headers = {
-    "Authorization": f"Bearer {os.getenv('ha_token')}",
+    "Authorization": f"Bearer {os.getenv('HA_TOKEN')}",
     "Content-Type": "application/json"
 }
 

@@ -17,4 +17,5 @@ child=$!
 wait "$child"
 
 #Output all variables in the current shell
-echo "Environment variables:" env
+echo "Environment variables:"
+env
