@@ -41,3 +41,4 @@ secrets.yaml
 *.gz
 
 # Add-on generated files
+wnsm_sync/CHANGELOG.md

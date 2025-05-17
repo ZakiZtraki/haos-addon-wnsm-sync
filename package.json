@@ -5,8 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "sync-changelog": "cp CHANGELOG.md wnsm_sync/CHANGELOG.md",
+    "build-addon": "npm run sync-changelog && docker build -t wnsm_sync:latest wnsm_sync/",
     "release": "standard-version",
-    "release:full": "npm run release && git push --follow-tags"
+    "release:full": "npm run release && git push --follow-tags",
+    "release:build": "npm run release:full && npm run build-addon"
   },
   "repository": {
     "type": "git",
