@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.36](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.35...v1.2.36) (2025-05-17)
+
+
+### Bug Fixes
+
+* use resolved HA_TOKEN instead of direct getenv to avoid missing token during upload ([4d586b0](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/4d586b02563cd8d3a9629f8fb4e2c6a9edc4ad85))
+
 ### [1.2.35](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.34...v1.2.35) (2025-05-17)
 
 
