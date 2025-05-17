@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.34](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.33...v1.2.34) (2025-05-17)
+
+### [1.2.33](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.32...v1.2.33) (2025-05-17)
+
+
+### Bug Fixes
+
+* ensure env vars are loaded correctly from Supervisor into Python script ([f2a6ca7](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/f2a6ca7851aded208901e56e2caf462b12013a61))
+
 ### [1.2.32](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.31...v1.2.32) (2025-05-17)
 
 ### [1.2.31](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.30...v1.2.31) (2025-05-17)
