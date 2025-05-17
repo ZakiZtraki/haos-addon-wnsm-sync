@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.19](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.18...v1.2.19) (2025-05-17)
+
+
+### Bug Fixes
+
+* add jq to Dockerfile to enable environment variable fallback from options.json ([022da73](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/022da73648cf06a38c82cbda3dcec95ed6be7602))
+
 ### [1.2.18](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.17...v1.2.18) (2025-05-17)
 
 ### [1.2.17](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.16...v1.2.17) (2025-05-17)
