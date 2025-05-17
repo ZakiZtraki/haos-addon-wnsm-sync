@@ -29,3 +29,5 @@ fi
 
 echo "[DEBUG] HA_URL=$HA_URL"
 echo "[DEBUG] STAT_ID=$STAT_ID"
+
+env

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.25](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.24...v1.2.25) (2025-05-17)
+
+
+### Bug Fixes
+
+* changed default HA base url ([d181fa5](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/d181fa568e2283a6423004daa394ac9f4a14bb00))
+
 ### [1.2.24](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.23...v1.2.24) (2025-05-17)
 
 ### [1.2.23](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.22...v1.2.23) (2025-05-17)
