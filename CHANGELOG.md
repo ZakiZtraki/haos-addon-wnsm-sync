@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.14](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.13...v1.2.14) (2025-05-17)
+
+
+### Bug Fixes
+
+* align sync logic with updated Smartmeter API response structure ('values', 'zeitpunktVon', 'wert') ([d0cce26](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/d0cce262e03093d0917fcb89d65339d9f50bd514))
+
 ### [1.2.13](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.8...v1.2.13) (2025-05-17)
 
 
