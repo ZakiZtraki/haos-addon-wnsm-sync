@@ -85,6 +85,24 @@ for entry in bewegungsdaten["values"]:
 
 print(f"🔍 Publishing {len(statistics)} entries to MQTT topics under '{MQTT_TOPIC}/<timestamp>'")
 
+publish.single(
+    topic="homeassistant/sensor/wn_energy/config",
+    payload=json.dumps({
+        "name": "Wiener Netze Energy",
+        "state_topic": "smartmeter/energy/state",
+        "unit_of_measurement": "kWh",
+        "device_class": "energy",
+        "state_class": "total_increasing",
+        "unique_id": "wn_energy_sensor",
+        "value_template": "{{ value_json.value }}"
+        }),
+        hostname=MQTT_HOST,
+        auth={
+            "username": MQTT_USERNAME,
+            "password": MQTT_PASSWORD
+        },
+        retain=True
+)
 for s in statistics:
     topic = f"{MQTT_TOPIC}/{s['start'][:16]}"  # e.g. smartmeter/energy/state/2025-05-16T00:15
     payload = {
@@ -92,7 +110,7 @@ for s in statistics:
         "timestamp": s["start"]
     }
     publish.single(
-        topic,
+        topic=topic,
         payload=json.dumps(payload),
         hostname=MQTT_HOST,
         auth={
