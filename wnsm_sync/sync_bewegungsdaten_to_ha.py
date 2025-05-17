@@ -52,7 +52,7 @@ bewegungsdaten = client.bewegungsdaten(
     zaehlpunktnummer=ZP,
     date_from=date_from,
     date_until=date_until,
-    aggregat="V002"
+    aggregat="NONE"
 )
 
 # === Prepare Data for HA REST API ===

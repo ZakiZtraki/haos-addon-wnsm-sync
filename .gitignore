@@ -41,4 +41,3 @@ secrets.yaml
 *.gz
 
 # Add-on generated files
-CHANGELOG.md
