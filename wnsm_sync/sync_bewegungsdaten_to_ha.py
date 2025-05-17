@@ -88,6 +88,13 @@ headers = {
     "Content-Type": "application/json"
 }
 
+if not HA_URL or not STATISTIC_ID:
+    print(f"❌ Cannot post: HA_URL or STAT_ID is missing — HA_URL={HA_URL}, STAT_ID={STATISTIC_ID}")
+    sys.exit(1)
+
+
+print(f"🔍 Uploading {len(statistics)} entries to {HA_URL}/api/recorder/statistics")
+
 resp = requests.post(f"{HA_URL}/api/recorder/statistics", headers=headers, data=json.dumps(payload))
 
 if resp.status_code == 200:
