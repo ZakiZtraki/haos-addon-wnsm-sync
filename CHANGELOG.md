@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.37](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.36...v1.2.37) (2025-05-17)
+
+
+### Bug Fixes
+
+* use correct internal HA URL (http://homeassistant:8123) instead of supervisor proxy ([0c96c0d](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/0c96c0d24f54fa6d6514981447d5a4374fceeb69))
+
 ### [1.2.36](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.35...v1.2.36) (2025-05-17)
 
 
