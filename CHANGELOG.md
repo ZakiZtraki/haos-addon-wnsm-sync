@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.15](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.14...v1.2.15) (2025-05-17)
+
+
+### Bug Fixes
+
+* validate HA_URL and STATISTIC_ID before POST to prevent silent 404 error ([38a86ee](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/38a86ee296331f033ce73f49d68cd79deab9968b))
+
 ### [1.2.14](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.2.13...v1.2.14) (2025-05-17)
 
 
