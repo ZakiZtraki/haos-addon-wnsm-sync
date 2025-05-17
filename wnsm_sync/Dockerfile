@@ -14,7 +14,7 @@ COPY api /app/api
 COPY sync_bewegungsdaten_to_ha.py /app/sync_bewegungsdaten_to_ha.py
 
 # Copy changelog for Home Assistant UI visibility
-# COPY CHANGELOG.md /app/CHANGELOG.md
+COPY CHANGELOG.md /app/CHANGELOG.md
 
 # Entrypoint
 COPY run.sh /app/run.sh
