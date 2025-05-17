@@ -20,7 +20,7 @@
         "WNSM_GP": "",
         "WNSM_ZP": "",
         "HA_TOKEN": "",
-        "HA_URL": "https://haos.zenmedia.live",
+        "HA_URL": "",
         "STAT_ID": "sensor.wiener_netze_energy"
     },
     "schema": {

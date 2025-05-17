@@ -11,7 +11,7 @@ USERNAME = os.getenv("WNSM_USERNAME")
 PASSWORD = os.getenv("WNSM_PASSWORD")
 GP = os.getenv("WNSM_GP")
 ZP = os.getenv("WNSM_ZP")
-HA_URL = os.getenv("HA_URL", "https://haos.zenmedia.live")
+HA_URL = os.getenv("HA_URL", "http://supervisor/core")
 HA_TOKEN = os.getenv("HA_TOKEN")
 STATISTIC_ID = os.getenv("STAT_ID", "sensor.wiener_netze_energy")
 
@@ -49,7 +49,7 @@ date_from = datetime.fromisoformat(from_ts.replace("Z", "")).date()
 date_until = datetime.fromisoformat(to_ts.replace("Z", "")).date()
 
 bewegungsdaten = client.bewegungsdaten(
-    zaehlpunktnummer=ZP,
+    zaehlpunktnummer=zp,
     date_from=date_from,
     date_until=date_until,
     aggregat="NONE"
@@ -87,6 +87,8 @@ headers = {
     "Authorization": f"Bearer {ha_token}",
     "Content-Type": "application/json"
 }
+
+print("🔍 Final headers:", headers)
 
 if not HA_URL or not stat_id:
     print(f"❌ Cannot post: HA_URL or STAT_ID is missing — HA_URL={ha_url}, STAT_ID={stat_id}")
