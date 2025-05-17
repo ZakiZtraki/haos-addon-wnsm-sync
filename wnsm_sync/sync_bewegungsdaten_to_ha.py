@@ -59,9 +59,9 @@ bewegungsdaten = client.bewegungsdaten(
 total = Decimal(0)
 statistics = []
 
-for entry in bewegungsdaten["data"]:
-    ts = datetime.fromisoformat(entry["time"].replace("Z", "+00:00"))
-    value_kwh = Decimal(entry["energyConsumption"])
+for entry in bewegungsdaten["values"]:
+    ts = datetime.fromisoformat(entry["zeitpunktVon"].replace("Z", "+00:00"))
+    value_kwh = Decimal(str(entry["wert"]))  # Ensure proper Decimal conversion
     total += value_kwh
     statistics.append({
         "start": ts.isoformat(),
