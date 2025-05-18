@@ -18,26 +18,28 @@
     "options": {
         "WNSM_USERNAME": "",
         "WNSM_PASSWORD": "",
-        "WNSM_GP": "",
-        "WNSM_ZP": "",
-        "HA_TOKEN": "",
         "HA_URL": "",
         "STAT_ID": "sensor.wiener_netze_energy",
         "MQTT_USERNAME": "",
         "MQTT_PASSWORD": "",
-        "MQTT_HOST": ""
+        "MQTT_HOST": "",
+        "HISTORY_DAYS": "",
+        "MQTT_TOPIC": "",
+        "RETRY_COUNT": "",
+        "RETRY_DELAY": ""
     },
     "schema": {
         "WNSM_USERNAME": "str",
         "WNSM_PASSWORD": "str",
-        "WNSM_GP": "str",
-        "WNSM_ZP": "str",
-        "HA_TOKEN": "str",
         "HA_URL": "str",
         "STAT_ID": "str",
         "MQTT_USERNAME": "str",
         "MQTT_PASSWORD": "str",
-        "MQTT_HOST": "str"
+        "MQTT_HOST": "str",
+        "HISTORY_DAYS": "str",
+        "MQTT_TOPIC": "str",
+        "RETRY_COUNT": "str",
+        "RETRY_DELAY": "str"
     },
     "build": true,
     "udev": true,

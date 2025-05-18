@@ -29,10 +29,7 @@ def get_config():
     config = {
         "USERNAME": os.getenv("WNSM_USERNAME"),
         "PASSWORD": os.getenv("WNSM_PASSWORD"),
-        "GP": os.getenv("WNSM_GP"),
-        "ZP": os.getenv("WNSM_ZP"),
         "HA_URL": os.getenv("HA_URL", "http://homeassistant:8123"),
-        "HA_TOKEN": os.getenv("SUPERVISOR_TOKEN") or os.getenv("HASSIO_TOKEN") or os.getenv("HA_TOKEN"),
         "STATISTIC_ID": os.getenv("STAT_ID", "sensor.wiener_netze_energy"),
         "MQTT_HOST": os.getenv("MQTT_HOST", "core-mosquitto"),
         "MQTT_TOPIC": os.getenv("MQTT_TOPIC", "smartmeter/energy/state"),
