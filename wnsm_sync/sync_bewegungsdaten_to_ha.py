@@ -124,19 +124,20 @@ def load_session(client, config):
 def publish_mqtt_discovery(config):
     """Publish MQTT discovery configuration for Home Assistant."""
     try:
-        device_id = config["ZP"].lower().replace("-", "")
+        device_id = config["ZP"].lower().replace("0", "")
         publish.single(
-            topic=f"homeassistant/sensor/wn_energy_{device_id}/config",
+            topic=f"homeassistant/sensor/wnsm_sync_{device_id}/config",
             payload=json.dumps({
-                "name": "Wiener Netze Energy",
+                "name": "Wiener Netze Smartmeter Sync",
                 "state_topic": config["MQTT_TOPIC"],
                 "unit_of_measurement": "kWh",
                 "device_class": "energy",
                 "state_class": "total_increasing",
-                "unique_id": f"wn_energy_sensor_{device_id}",
+                "unique_id": f"wnsm_sync_energy_sensor_{device_id}",
                 "value_template": "{{ value_json.value }}",
+                "timestamp_template": "{{ value_json.timestamp }}",
                 "device": {
-                    "identifiers": [f"wn_smartmeter_{device_id}"],
+                    "identifiers": [f"wnsm_sync_{device_id}"],
                     "name": "Wiener Netze Smart Meter",
                     "manufacturer": "Wiener Netze",
                     "model": "Smart Meter"
