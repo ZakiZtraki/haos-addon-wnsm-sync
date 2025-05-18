@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.1](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.5.0...v1.5.1) (2025-05-18)
+
+## [1.5.0](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.4.1...v1.5.0) (2025-05-18)
+
+
+### Features
+
+* add MQTT configuration for Wiener Netze Energy sensor ([356228f](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/commit/356228f1916a0c293709be018399a37585b9d459))
+
 ### [1.4.1](https://github.com/ZakiZtraki/homeassistant-addon-wnsm-sync/compare/v1.4.0...v1.4.1) (2025-05-17)
 
 
