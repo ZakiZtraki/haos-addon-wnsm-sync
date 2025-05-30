@@ -1,0 +1,65 @@
+#!/usr/bin/with-contenv bashio
+# ==============================================================================
+# Export all configuration values to environment
+# ==============================================================================
+
+# Required values
+export WNSM_USERNAME=$(bashio::config 'WNSM_USERNAME')
+export WNSM_PASSWORD=$(bashio::config 'WNSM_PASSWORD')
+export ZP=$(bashio::config 'ZP')
+export MQTT_HOST=$(bashio::config 'MQTT_HOST')
+
+# Optional values with defaults
+if bashio::config.has_value 'MQTT_PORT'; then
+    export MQTT_PORT=$(bashio::config 'MQTT_PORT')
+fi
+
+if bashio::config.has_value 'MQTT_USERNAME'; then
+    export MQTT_USERNAME=$(bashio::config 'MQTT_USERNAME')
+fi
+
+if bashio::config.has_value 'MQTT_PASSWORD'; then
+    export MQTT_PASSWORD=$(bashio::config 'MQTT_PASSWORD')
+fi
+
+if bashio::config.has_value 'MQTT_TOPIC'; then
+    export MQTT_TOPIC=$(bashio::config 'MQTT_TOPIC')
+fi
+
+if bashio::config.has_value 'UPDATE_INTERVAL'; then
+    export UPDATE_INTERVAL=$(bashio::config 'UPDATE_INTERVAL')
+fi
+
+if bashio::config.has_value 'HISTORY_DAYS'; then
+    export HISTORY_DAYS=$(bashio::config 'HISTORY_DAYS')
+fi
+
+if bashio::config.has_value 'RETRY_COUNT'; then
+    export RETRY_COUNT=$(bashio::config 'RETRY_COUNT')
+fi
+
+if bashio::config.has_value 'RETRY_DELAY'; then
+    export RETRY_DELAY=$(bashio::config 'RETRY_DELAY')
+fi
+
+if bashio::config.has_value 'DEBUG'; then
+    export DEBUG=$(bashio::config 'DEBUG')
+fi
+
+if bashio::config.has_value 'HA_URL'; then
+    export HA_URL=$(bashio::config 'HA_URL')
+fi
+
+if bashio::config.has_value 'STAT_ID'; then
+    export STAT_ID=$(bashio::config 'STAT_ID')
+fi
+
+# Debug output
+bashio::log.info "Starting Wiener Netze Smart Meter service..."
+bashio::log.debug "Configuration loaded with the following values:"
+bashio::log.debug "WNSM_USERNAME: $(bashio::var.json WNSM_USERNAME)"
+bashio::log.debug "ZP: $(bashio::var.json ZP)"
+bashio::log.debug "MQTT_HOST: $(bashio::var.json MQTT_HOST)"
+
+# Run application
+python3 /app/run.py

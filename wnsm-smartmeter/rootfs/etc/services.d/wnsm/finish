@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv bashio
+# ==============================================================================
+# Handle service shutdown
+# ==============================================================================
+bashio::log.info "Wiener Netze Smart Meter service terminated"
