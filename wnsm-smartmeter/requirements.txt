@@ -1,0 +1,5 @@
+requests>=2.26.0
+lxml>=4.9.3
+python-dateutil>=2.8.2
+paho-mqtt>=1.6.1
+git+https://github.com/cretl/vienna-smartmeter.git@fix-login-add-pkce
