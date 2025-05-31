@@ -47,7 +47,7 @@ def load_config():
                 key_mapping = {
                     "WNSM_USERNAME": "USERNAME",
                     "WNSM_PASSWORD": "PASSWORD",
-                    "ZP": "ZP",
+                    "WNSM_ZP": "ZP",
                     "MQTT_HOST": "MQTT_HOST",
                     "MQTT_PORT": "MQTT_PORT",
                     "MQTT_USERNAME": "MQTT_USERNAME",

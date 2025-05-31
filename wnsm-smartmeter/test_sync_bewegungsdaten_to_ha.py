@@ -60,16 +60,28 @@ def test_load_config_from_options_json(monkeypatch, tmp_path):
     with open(options_path, "w") as f:
         json.dump(options, f)
 
-    # Patch open to use our options.json
-    def fake_open(path, *args, **kwargs):
+    # Create a mock for os.path.exists
+    def mock_exists(path):
         if path == "/data/options.json":
-            return builtins.open(options_path, *args, **kwargs)
-        return builtins.open(path, *args, **kwargs)
+            return True
+        return False
+    monkeypatch.setattr(os.path, "exists", mock_exists)
 
-    monkeypatch.setattr("builtins.open", fake_open)
+    # Create a mock for open that returns our file content
+    mock_file = mock.mock_open(read_data=json.dumps(options))
+    original_open = builtins.open
+    
+    def patched_open(filename, *args, **kwargs):
+        if filename == "/data/options.json":
+            return mock_file(filename, *args, **kwargs)
+        return original_open(filename, *args, **kwargs)
+    
+    monkeypatch.setattr(builtins, "open", patched_open)
+    
     # Patch sys.exit to raise SystemExit so we can catch it if called
     with mock.patch.object(sys, "exit", side_effect=SystemExit):
         config = load_config()
+    
     assert config["USERNAME"] == "user2"
     assert config["PASSWORD"] == "pass2"
     assert config["ZP"] == "987654321"
