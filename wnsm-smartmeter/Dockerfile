@@ -1,8 +1,18 @@
 # Use Python as the base image for easier dependency management
 FROM python:3.11-alpine
 
-# Install required system packages for Home Assistant
-RUN apk add --no-cache bash jq tzdata ca-certificates git
+# Install required system packages for Home Assistant and build dependencies
+RUN apk add --no-cache \
+    bash \
+    jq \
+    tzdata \
+    ca-certificates \
+    git \
+    gcc \
+    musl-dev \
+    libxml2-dev \
+    libxslt-dev \
+    python3-dev
 
 # Set working directory
 WORKDIR /app
@@ -10,6 +20,9 @@ WORKDIR /app
 # Copy requirements file and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Clean up build dependencies to reduce image size
+RUN apk del gcc musl-dev python3-dev
 
 # Copy application code
 COPY wnsm_sync/ ./wnsm_sync/
