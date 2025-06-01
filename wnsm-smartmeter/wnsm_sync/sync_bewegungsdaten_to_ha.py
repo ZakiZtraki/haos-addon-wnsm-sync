@@ -350,8 +350,8 @@ def publish_mqtt_discovery(config):
             "state_topic": f"{config['MQTT_TOPIC']}/+",  # Use wildcard to capture timestamped topics
             "unit_of_measurement": "kWh",
             "device_class": "energy",
-            "state_class": "total_increasing",  # Changed to total_increasing for cumulative energy
-            "unique_id": f"wnsm_sync_energy_sensor_{device_id}",
+            "state_class": "measurement",  # Use measurement for individual 15-minute readings
+            "unique_id": f"wnsm_sync_energy_sensor_{device_id}_v3",  # Force re-discovery
             "value_template": "{{ value_json.delta }}",  # Use delta field for 15-minute consumption
             "json_attributes_topic": f"{config['MQTT_TOPIC']}/+",
             "json_attributes_template": "{{ {'timestamp': value_json.timestamp, 'start': value_json.start, 'sum': value_json.sum} | tojson }}",
@@ -412,12 +412,8 @@ def publish_mqtt_data(statistics, config):
     # Sort statistics by timestamp to ensure proper ordering
     statistics.sort(key=lambda x: x.get('start', ''))
     
-    # Try to use Home Assistant's REST API for historical statistics first
-    if publish_statistics_to_ha_api(statistics, config):
-        return
-    
-    # Fallback to MQTT with timestamped topics
-    logger.info("Using MQTT fallback with timestamped topics")
+    # Publish to MQTT with timestamped topics
+    logger.info("Publishing to MQTT with timestamped topics")
     
     total_published = 0
     for entry in statistics:
@@ -458,85 +454,6 @@ def publish_mqtt_data(statistics, config):
     if statistics:
         total_consumption = sum(s.get('delta', 0) for s in statistics)
         logger.info(f"Total consumption for period: {total_consumption:.3f} kWh across {len(statistics)} intervals")
-
-def publish_statistics_to_ha_api(statistics, config):
-    """Publish statistics to Home Assistant using the REST API for historical data."""
-    try:
-        import requests
-        import os
-        
-        # Home Assistant REST API endpoint for statistics
-        ha_url = config.get("HA_URL", "http://supervisor/core")
-        ha_token = config.get("HA_TOKEN", os.environ.get("SUPERVISOR_TOKEN"))
-        
-        if not ha_token:
-            logger.warning("No Home Assistant token available, skipping REST API")
-            return False
-        
-        # Prepare statistics for Home Assistant's statistics API
-        ha_statistics = []
-        total_sum = 0
-        
-        for entry in statistics:
-            if not isinstance(entry, dict) or 'start' not in entry or 'delta' not in entry:
-                continue
-                
-            try:
-                # Convert timestamp to the format HA expects (ISO format)
-                timestamp = entry["start"]
-                delta_kwh = float(entry["delta"])
-                total_sum += delta_kwh
-                
-                # Create statistics entry for Home Assistant
-                stat_entry = {
-                    "start": timestamp,
-                    "state": delta_kwh,  # The 15-minute consumption
-                    "sum": total_sum     # Running total
-                }
-                
-                ha_statistics.append(stat_entry)
-                
-            except Exception as e:
-                logger.warning(f"Error preparing entry {entry}: {e}")
-                continue
-        
-        if not ha_statistics:
-            logger.warning("No valid statistics to publish to HA API")
-            return False
-        
-        # Prepare the statistics payload
-        device_id = config["ZP"].lower().replace("0", "")
-        statistic_id = f"sensor.wiener_netze_smart_meter_wnsm_15min_energy"
-        
-        payload = {
-            "statistic_id": statistic_id,
-            "source": "wnsm_sync",
-            "name": "WNSM 15min Energy",
-            "unit_of_measurement": "kWh",
-            "has_mean": False,
-            "has_sum": True,
-            "statistics": ha_statistics
-        }
-        
-        headers = {
-            "Authorization": f"Bearer {ha_token}",
-            "Content-Type": "application/json"
-        }
-        
-        # Post to Home Assistant statistics API
-        url = f"{ha_url}/api/statistics"
-        response = requests.post(url, json=payload, headers=headers, timeout=30)
-        
-        if response.status_code == 200:
-            logger.info(f"✅ Successfully published {len(ha_statistics)} statistics to Home Assistant REST API")
-            return True
-        else:
-            logger.warning(f"Failed to publish statistics to HA API: {response.status_code} - {response.text}")
-            return False
-            
-    except Exception as e:
-        logger.warning(f"Error publishing to Home Assistant API: {e}")
-        return False
 
 def main():
     """Main function to run the sync process."""
