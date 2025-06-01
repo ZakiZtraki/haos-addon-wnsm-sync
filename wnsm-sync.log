@@ -70,3 +70,23 @@
 2025-06-01 12:46:26,964 - wnsm_smartmeter - INFO - ✅ Published 0 15-minute intervals to MQTT topic: smartmeter/energy/state
 2025-06-01 12:46:26,964 - wnsm_smartmeter - INFO - Total consumption for period: 0.000 kWh across 48 intervals
 2025-06-01 12:46:26,964 - wnsm-addon - INFO - Sleeping for 86400 seconds
+2025-06-01 14:15:47,413 - wnsm-addon - INFO - Using vienna-smartmeter version: 0.3.2
+2025-06-01 14:15:47,413 - wnsm-addon - INFO - vienna-smartmeter library has bewegungsdaten method
+2025-06-01 14:15:47,413 - wnsm-addon - INFO - Loading configuration from /data/options.json
+2025-06-01 14:15:47,414 - wnsm-addon - INFO - Wiener Netze Smart Meter Add-on started
+2025-06-01 14:15:47,414 - wnsm-addon - INFO - Publishing MQTT discovery configuration
+2025-06-01 14:15:47,417 - wnsm_smartmeter - INFO - MQTT discovery configuration published
+2025-06-01 14:15:47,417 - wnsm-addon - INFO - Fetching Bewegungsdaten from Wiener Netze
+2025-06-01 14:15:47,418 - wnsm_smartmeter - INFO - Initializing Wiener Netze Smartmeter client
+2025-06-01 14:15:48,408 - wnsm_smartmeter - INFO - Logging in to Wiener Netze service
+2025-06-01 14:15:48,408 - wnsm_smartmeter - INFO - Using yesterday (2025-05-31) as end date since data is only available until the previous day
+2025-06-01 14:15:48,408 - wnsm_smartmeter - INFO - Fetching data from 2025-05-29 to 2025-05-31 (3 days)
+2025-06-01 14:15:48,408 - wnsm_smartmeter - INFO - Fetching bewegungsdaten for zaehlpunkt AT0010000000000000001000004392265
+2025-06-01 14:15:48,408 - wnsm_smartmeter - ERROR - Error fetching Bewegungsdaten: No module named 'api'
+2025-06-01 14:15:48,408 - wnsm_smartmeter - ERROR - No module named 'api'
+Traceback (most recent call last):
+  File "/app/wnsm_sync/sync_bewegungsdaten_to_ha.py", line 613, in fetch_bewegungsdaten
+    from api import constants as const
+ModuleNotFoundError: No module named 'api'
+2025-06-01 14:15:48,409 - wnsm-addon - WARNING - No data fetched from Wiener Netze
+2025-06-01 14:15:48,409 - wnsm-addon - INFO - Sleeping for 86400 seconds

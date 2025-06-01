@@ -12,17 +12,28 @@ RUN apk add --no-cache \
     musl-dev \
     libxml2-dev \
     libxslt-dev \
-    python3-dev
+    python3-dev \
+    libffi-dev \
+    openssl-dev
 
 # Set working directory
 WORKDIR /app
 
 # Copy requirements file and install dependencies
 COPY requirements.txt .
+
+# Upgrade pip and install wheel first
+RUN pip install --upgrade pip wheel
+
+# Install lxml separately with specific flags for ARM
+RUN pip install --no-cache-dir lxml==4.9.4 --only-binary=:all: || \
+    pip install --no-cache-dir lxml==4.9.4
+
+# Install remaining requirements
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Clean up build dependencies to reduce image size
-RUN apk del gcc musl-dev python3-dev
+RUN apk del gcc musl-dev python3-dev libffi-dev openssl-dev
 
 # Copy application code
 COPY wnsm_sync/ ./wnsm_sync/

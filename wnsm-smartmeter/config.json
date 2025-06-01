@@ -5,11 +5,8 @@
     "description": "Integration for Wiener Netze Smart Meter that fetches 15-min consumption data and pushes to Home Assistant statistics.",
     "url": "https://github.com/ZakiZtraki/haos-addon-wnsm-sync",
     "arch": [
-        "armhf",
-        "armv7",
         "aarch64",
-        "amd64",
-        "i386"
+        "amd64"
     ],
     "startup": "application",
     "boot": "auto",
