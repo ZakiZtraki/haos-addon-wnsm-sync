@@ -352,9 +352,9 @@ def publish_mqtt_discovery(config):
             "device_class": "energy",
             "state_class": "total",  # Use total for energy device class
             "unique_id": f"wnsm_sync_energy_sensor_{device_id}_v4",  # Force re-discovery
-            "value_template": "{{ value_json.sum | float }}",  # Use cumulative sum for total state class
+            "value_template": "{{ value_json.sum | default(value_json.value) | float }}",  # Use cumulative sum or fallback to value
             "json_attributes_topic": f"{config['MQTT_TOPIC']}/+",
-            "json_attributes_template": "{{ {'timestamp': value_json.timestamp, 'start': value_json.start, 'delta': value_json.delta, 'interval_kwh': value_json.delta} | tojson }}",
+            "json_attributes_template": "{{ {'timestamp': value_json.timestamp | default(''), 'start': value_json.start | default(''), 'delta': value_json.delta | default(value_json.value) | default(0), 'interval_kwh': value_json.delta | default(value_json.value) | default(0)} | tojson }}",
             "device": {
                 "identifiers": [f"wnsm_sync_{device_id}"],
                 "name": "Wiener Netze Smart Meter",  # This is the device name
@@ -373,9 +373,9 @@ def publish_mqtt_discovery(config):
             "unit_of_measurement": "kWh",
             "state_class": "measurement",  # No device class, so measurement is allowed
             "unique_id": f"wnsm_interval_sensor_{device_id}_v1",
-            "value_template": "{{ value_json.delta | float }}",  # Individual 15-minute consumption
+            "value_template": "{{ value_json.delta | default(value_json.value) | float }}",  # Individual 15-minute consumption
             "json_attributes_topic": f"{config['MQTT_TOPIC']}/+",
-            "json_attributes_template": "{{ {'timestamp': value_json.timestamp, 'start': value_json.start, 'cumulative_sum': value_json.sum} | tojson }}",
+            "json_attributes_template": "{{ {'timestamp': value_json.timestamp | default(''), 'start': value_json.start | default(''), 'cumulative_sum': value_json.sum | default(value_json.value) | default(0)} | tojson }}",
             "device": {
                 "identifiers": [f"wnsm_sync_{device_id}"],
                 "name": "Wiener Netze Smart Meter",
