@@ -97,10 +97,19 @@ def load_config():
             logger.info(f"Loading configuration from {options_file}")
             with open(options_file, 'r') as f:
                 options = json.loads(f.read())
-                logger.debug(f"Loaded options: {', '.join(options.keys())}")
+                logger.info(f"Loaded options: {', '.join(options.keys())}")
+                
+                # Debug: Show all options (hide sensitive values)
+                logger.info("Current add-on configuration:")
+                for key, value in options.items():
+                    if 'PASSWORD' in key.upper():
+                        logger.info(f"  {key}: {'****' if value else '(empty)'}")
+                    else:
+                        logger.info(f"  {key}: {value}")
                 
                 # Check if secrets mode is enabled
                 use_secrets = options.get("USE_SECRETS", False)
+                logger.info(f"USE_SECRETS mode: {use_secrets}")
                 if use_secrets:
                     logger.info("Secrets mode enabled - will load credentials from secrets.yaml")
                 
@@ -144,9 +153,20 @@ def load_config():
     secrets = {}
     missing_required = not all(key in config and config[key] for key in ["USERNAME", "PASSWORD", "ZP"])
     
+    logger.info(f"Checking if secrets are needed:")
+    logger.info(f"  USE_SECRETS: {use_secrets}")
+    logger.info(f"  Missing required credentials: {missing_required}")
+    logger.info(f"  Current config keys: {list(config.keys())}")
+    
     if use_secrets or missing_required:
         logger.info("Loading secrets from secrets.yaml")
         secrets = load_secrets()
+        
+        if secrets:
+            logger.info(f"Successfully loaded {len(secrets)} secrets")
+            logger.info(f"Available secret keys: {list(secrets.keys())}")
+        else:
+            logger.warning("No secrets loaded - secrets.yaml may be missing or empty")
         
         # Define secret mappings
         secret_mappings = {
