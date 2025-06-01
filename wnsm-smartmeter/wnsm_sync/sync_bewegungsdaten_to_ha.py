@@ -350,11 +350,11 @@ def publish_mqtt_discovery(config):
             "state_topic": f"{config['MQTT_TOPIC']}/+",  # Use wildcard to capture timestamped topics
             "unit_of_measurement": "kWh",
             "device_class": "energy",
-            "state_class": "measurement",  # Use measurement for individual 15-minute readings
-            "unique_id": f"wnsm_sync_energy_sensor_{device_id}_v3",  # Force re-discovery
-            "value_template": "{{ value_json.delta }}",  # Use delta field for 15-minute consumption
+            "state_class": "total",  # Use total for energy device class
+            "unique_id": f"wnsm_sync_energy_sensor_{device_id}_v4",  # Force re-discovery
+            "value_template": "{{ value_json.sum | float }}",  # Use cumulative sum for total state class
             "json_attributes_topic": f"{config['MQTT_TOPIC']}/+",
-            "json_attributes_template": "{{ {'timestamp': value_json.timestamp, 'start': value_json.start, 'sum': value_json.sum} | tojson }}",
+            "json_attributes_template": "{{ {'timestamp': value_json.timestamp, 'start': value_json.start, 'delta': value_json.delta, 'interval_kwh': value_json.delta} | tojson }}",
             "device": {
                 "identifiers": [f"wnsm_sync_{device_id}"],
                 "name": "Wiener Netze Smart Meter",  # This is the device name
@@ -364,7 +364,28 @@ def publish_mqtt_discovery(config):
         }
         
         publish_mqtt_message(discovery_topic, discovery_payload, config)
-        logger.info("MQTT discovery configuration published")
+        
+        # Also create a separate sensor for individual 15-minute readings
+        interval_discovery_topic = f"homeassistant/sensor/wnsm_interval_{device_id}/config"
+        interval_discovery_payload = {
+            "name": "WNSM 15min Interval",  # Individual 15-minute consumption
+            "state_topic": f"{config['MQTT_TOPIC']}/+",
+            "unit_of_measurement": "kWh",
+            "state_class": "measurement",  # No device class, so measurement is allowed
+            "unique_id": f"wnsm_interval_sensor_{device_id}_v1",
+            "value_template": "{{ value_json.delta | float }}",  # Individual 15-minute consumption
+            "json_attributes_topic": f"{config['MQTT_TOPIC']}/+",
+            "json_attributes_template": "{{ {'timestamp': value_json.timestamp, 'start': value_json.start, 'cumulative_sum': value_json.sum} | tojson }}",
+            "device": {
+                "identifiers": [f"wnsm_sync_{device_id}"],
+                "name": "Wiener Netze Smart Meter",
+                "manufacturer": "Wiener Netze",
+                "model": "Smart Meter"
+            }
+        }
+        
+        publish_mqtt_message(interval_discovery_topic, interval_discovery_payload, config)
+        logger.info("MQTT discovery configurations published (total energy + 15min intervals)")
     except Exception as e:
         logger.error(f"Failed to publish MQTT discovery: {e}")
 
@@ -415,6 +436,8 @@ def publish_mqtt_data(statistics, config):
     # Publish to MQTT with timestamped topics
     logger.info("Publishing to MQTT with timestamped topics")
     
+    # Calculate running totals for cumulative sum
+    running_total = 0
     total_published = 0
     for entry in statistics:
         if not isinstance(entry, dict):
@@ -426,6 +449,9 @@ def publish_mqtt_data(statistics, config):
             continue
         
         try:
+            # Calculate running total
+            running_total += entry["delta"]
+            
             # Create unique topic for each timestamp to avoid overwriting
             timestamp_str = entry["start"].replace(":", "").replace("-", "").replace("T", "_").replace("Z", "")
             timestamped_topic = f"{config['MQTT_TOPIC']}/{timestamp_str}"
@@ -435,7 +461,7 @@ def publish_mqtt_data(statistics, config):
                 "delta": entry["delta"],  # 15-minute consumption in kWh
                 "timestamp": entry["timestamp"],
                 "start": entry["start"],
-                "sum": entry.get("sum", 0)  # Include cumulative sum if available
+                "sum": running_total  # Cumulative sum for total state class
             }
             
             # Publish to timestamped topic
