@@ -1,0 +1,29 @@
+{
+  "name": "haos-addon-wnsm-sync",
+  "version": "0.3.10",
+  "description": "Wiener Netze Smart Meter Home Assistant Add-on",
+  "scripts": {
+    "commit": "cz",
+    "release": "standard-version",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
+    "release:patch": "standard-version --release-as patch",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
+  },
+  "devDependencies": {
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "standard-version": "^9.5.0",
+    "conventional-changelog-cli": "^4.1.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "standard-version": {
+    "scripts": {
+      "postchangelog": "cp CHANGELOG.md wnsm-smartmeter/CHANGELOG.md"
+    }
+  }
+}

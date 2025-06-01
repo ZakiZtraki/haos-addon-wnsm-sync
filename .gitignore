@@ -1,0 +1,92 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+.env
+.ve_addon/
+.venv*
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+# Keep package-lock.json for reproducible builds
+yarn.lock
+.npm
+.yarn-integrity
+
+# Conventional Commits & Release Tools (keep config files)
+# .czrc and pyproject.toml are tracked for configuration
+
+# Home Assistant Add-on specific
+.devcontainer/
+.storage/
+.cloud/
+.deps/
+.bash_history
+home-assistant.log*
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Distribution / packaging
+*.tar.gz
+*.zip
+
+# Secrets
+secrets.yaml
+*.pem
+*.key
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/

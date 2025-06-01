@@ -1,0 +1,88 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+DOCS.md
+*.md
+
+# Development tools
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+ENV/
+.env
+.ve_addon/
+.venv*
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+test/
+tests/
+*_test.py
+test_*.py
+
+# Secrets
+secrets.yaml
+*.pem
+*.key
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Home Assistant Add-on specific
+.devcontainer/
+.storage/
+.cloud/
+.deps/
+.bash_history
+home-assistant.log*
+
+# Distribution / packaging
+*.tar.gz
+*.zip
+
+# Keep only essential files for the Docker image
+# Include: Python source code, config files, requirements
+# Exclude: Development tools, tests, documentation

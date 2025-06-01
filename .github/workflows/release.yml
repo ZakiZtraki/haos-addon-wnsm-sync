@@ -1,0 +1,59 @@
+name: Release and Changelog
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+        - patch
+        - minor
+        - major
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'chore(release)')"
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Configure Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Generate release and changelog
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          npm run release:${{ github.event.inputs.release_type }}
+        else
+          npm run release
+        fi
+
+    - name: Copy changelog to addon directory
+      run: cp CHANGELOG.md wnsm-smartmeter/CHANGELOG.md
+
+    - name: Push changes
+      run: |
+        git add .
+        git commit --amend --no-edit
+        git push --follow-tags origin main

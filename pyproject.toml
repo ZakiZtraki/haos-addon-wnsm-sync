@@ -1,0 +1,72 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.3.10"
+tag_format = "v$version"
+version_files = [
+    "wnsm-smartmeter/config.yaml:version",
+    "package.json:version"
+]
+changelog_file = "CHANGELOG.md"
+changelog_start_rev = "v0.1.0"
+style = [
+    ["qmark", "fg:#ff9d00 bold"],
+    ["question", "bold"],
+    ["answer", "fg:#ff9d00 bold"],
+    ["pointer", "fg:#ff9d00 bold"],
+    ["highlighted", "fg:#ff9d00 bold"],
+    ["selected", "fg:#cc5454"],
+    ["separator", "fg:#cc5454"],
+    ["instruction", ""],
+    ["text", ""],
+    ["disabled", "fg:#858585 italic"]
+]
+
+[tool.commitizen.customize]
+message_template = "{{change_type}}{% if scope %}({{scope}}){% endif %}: {{subject}}{% if body %}\n\n{{body}}{% endif %}{% if footer %}\n\n{{footer}}{% endif %}"
+example = "feat(api): add support for 15-minute intervals"
+schema = """
+<type>(<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+"""
+schema_pattern = "^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\\(.+\\))?: .{1,50}"
+
+[[tool.commitizen.customize.questions]]
+type = "list"
+name = "change_type"
+choices = [
+    {value = "feat", name = "feat: A new feature"},
+    {value = "fix", name = "fix: A bug fix"},
+    {value = "docs", name = "docs: Documentation only changes"},
+    {value = "style", name = "style: Changes that do not affect the meaning of the code"},
+    {value = "refactor", name = "refactor: A code change that neither fixes a bug nor adds a feature"},
+    {value = "perf", name = "perf: A code change that improves performance"},
+    {value = "test", name = "test: Adding missing tests or correcting existing tests"},
+    {value = "build", name = "build: Changes that affect the build system or external dependencies"},
+    {value = "ci", name = "ci: Changes to our CI configuration files and scripts"},
+    {value = "chore", name = "chore: Other changes that don't modify src or test files"},
+    {value = "revert", name = "revert: Reverts a previous commit"}
+]
+message = "Select the type of change that you're committing"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "scope"
+message = "What is the scope of this change? (class or file name): (press [enter] to skip)"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "subject"
+message = "Write a short, imperative tense description of the change"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "body"
+message = "Provide a longer description of the change: (press [enter] to skip)"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "footer"
+message = "List any BREAKING CHANGES or CLOSES issues: (press [enter] to skip)"
