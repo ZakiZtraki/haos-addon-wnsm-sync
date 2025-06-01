@@ -347,14 +347,14 @@ def publish_mqtt_discovery(config):
         discovery_topic = f"homeassistant/sensor/wnsm_sync_{device_id}/config"
         discovery_payload = {
             "name": "WNSM 15min Energy",  # Clear name indicating 15-minute intervals
-            "state_topic": config["MQTT_TOPIC"],
+            "state_topic": f"{config['MQTT_TOPIC']}/+",  # Use wildcard to capture timestamped topics
             "unit_of_measurement": "kWh",
             "device_class": "energy",
-            "state_class": "measurement",  # Changed to measurement for delta values
+            "state_class": "total_increasing",  # Changed to total_increasing for cumulative energy
             "unique_id": f"wnsm_sync_energy_sensor_{device_id}",
-            "value_template": "{{ value_json.delta }}",  # Changed to use delta field
-            "json_attributes_topic": config["MQTT_TOPIC"],
-            "json_attributes_template": "{{ {'timestamp': value_json.timestamp} | tojson }}",
+            "value_template": "{{ value_json.delta }}",  # Use delta field for 15-minute consumption
+            "json_attributes_topic": f"{config['MQTT_TOPIC']}/+",
+            "json_attributes_template": "{{ {'timestamp': value_json.timestamp, 'start': value_json.start, 'sum': value_json.sum} | tojson }}",
             "device": {
                 "identifiers": [f"wnsm_sync_{device_id}"],
                 "name": "Wiener Netze Smart Meter",  # This is the device name
@@ -402,7 +402,7 @@ def publish_mqtt_message(topic, payload, config):
         return False
 
 def publish_mqtt_data(statistics, config):
-    """Publish energy data to MQTT as individual 15-minute deltas."""
+    """Publish energy data to Home Assistant using timestamped topics for historical data."""
     if not statistics:
         logger.warning("No statistics to publish")
         return
@@ -412,7 +412,13 @@ def publish_mqtt_data(statistics, config):
     # Sort statistics by timestamp to ensure proper ordering
     statistics.sort(key=lambda x: x.get('start', ''))
     
-    # Publish each 15-minute interval as a separate MQTT message
+    # Try to use Home Assistant's REST API for historical statistics first
+    if publish_statistics_to_ha_api(statistics, config):
+        return
+    
+    # Fallback to MQTT with timestamped topics
+    logger.info("Using MQTT fallback with timestamped topics")
+    
     total_published = 0
     for entry in statistics:
         if not isinstance(entry, dict):
@@ -424,29 +430,113 @@ def publish_mqtt_data(statistics, config):
             continue
         
         try:
+            # Create unique topic for each timestamp to avoid overwriting
+            timestamp_str = entry["start"].replace(":", "").replace("-", "").replace("T", "_").replace("Z", "")
+            timestamped_topic = f"{config['MQTT_TOPIC']}/{timestamp_str}"
+            
             # Create the MQTT payload with the 15-minute delta value
             payload = {
                 "delta": entry["delta"],  # 15-minute consumption in kWh
-                "timestamp": entry["timestamp"]
+                "timestamp": entry["timestamp"],
+                "start": entry["start"],
+                "sum": entry.get("sum", 0)  # Include cumulative sum if available
             }
             
-            # Publish to the main MQTT topic
-            # Home Assistant will receive each 15-minute interval separately
-            publish_mqtt_message(config["MQTT_TOPIC"], payload, config)
+            # Publish to timestamped topic
+            publish_mqtt_message(timestamped_topic, payload, config)
             total_published += 1
             
-            logger.debug(f"Published 15-min interval: {entry['timestamp']} = {entry['delta']} kWh")
+            logger.debug(f"Published 15-min interval: {entry['timestamp']} = {entry['delta']} kWh to {timestamped_topic}")
             
         except Exception as e:
             logger.warning(f"Error publishing entry {entry}: {e}")
             continue
     
-    logger.info(f"✅ Published {total_published} 15-minute intervals to MQTT topic: {config['MQTT_TOPIC']}")
+    logger.info(f"✅ Published {total_published} 15-minute intervals to MQTT with timestamped topics")
     
     # Log summary statistics
     if statistics:
         total_consumption = sum(s.get('delta', 0) for s in statistics)
         logger.info(f"Total consumption for period: {total_consumption:.3f} kWh across {len(statistics)} intervals")
+
+def publish_statistics_to_ha_api(statistics, config):
+    """Publish statistics to Home Assistant using the REST API for historical data."""
+    try:
+        import requests
+        import os
+        
+        # Home Assistant REST API endpoint for statistics
+        ha_url = config.get("HA_URL", "http://supervisor/core")
+        ha_token = config.get("HA_TOKEN", os.environ.get("SUPERVISOR_TOKEN"))
+        
+        if not ha_token:
+            logger.warning("No Home Assistant token available, skipping REST API")
+            return False
+        
+        # Prepare statistics for Home Assistant's statistics API
+        ha_statistics = []
+        total_sum = 0
+        
+        for entry in statistics:
+            if not isinstance(entry, dict) or 'start' not in entry or 'delta' not in entry:
+                continue
+                
+            try:
+                # Convert timestamp to the format HA expects (ISO format)
+                timestamp = entry["start"]
+                delta_kwh = float(entry["delta"])
+                total_sum += delta_kwh
+                
+                # Create statistics entry for Home Assistant
+                stat_entry = {
+                    "start": timestamp,
+                    "state": delta_kwh,  # The 15-minute consumption
+                    "sum": total_sum     # Running total
+                }
+                
+                ha_statistics.append(stat_entry)
+                
+            except Exception as e:
+                logger.warning(f"Error preparing entry {entry}: {e}")
+                continue
+        
+        if not ha_statistics:
+            logger.warning("No valid statistics to publish to HA API")
+            return False
+        
+        # Prepare the statistics payload
+        device_id = config["ZP"].lower().replace("0", "")
+        statistic_id = f"sensor.wiener_netze_smart_meter_wnsm_15min_energy"
+        
+        payload = {
+            "statistic_id": statistic_id,
+            "source": "wnsm_sync",
+            "name": "WNSM 15min Energy",
+            "unit_of_measurement": "kWh",
+            "has_mean": False,
+            "has_sum": True,
+            "statistics": ha_statistics
+        }
+        
+        headers = {
+            "Authorization": f"Bearer {ha_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Post to Home Assistant statistics API
+        url = f"{ha_url}/api/statistics"
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
+        
+        if response.status_code == 200:
+            logger.info(f"✅ Successfully published {len(ha_statistics)} statistics to Home Assistant REST API")
+            return True
+        else:
+            logger.warning(f"Failed to publish statistics to HA API: {response.status_code} - {response.text}")
+            return False
+            
+    except Exception as e:
+        logger.warning(f"Error publishing to Home Assistant API: {e}")
+        return False
 
 def main():
     """Main function to run the sync process."""
