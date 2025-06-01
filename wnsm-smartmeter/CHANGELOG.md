@@ -2,6 +2,13 @@
 
 ## [0.3.10] - 2025-06-01
 
+### Changes
+
+- Update version to 0.3.10
+
+
+## [0.3.10] - 2025-06-01
+
 ### Fixed
 - **MQTT Data Publishing**: Resolved "Skipping data point with missing fields" errors
   - Fixed data format mismatch between API response processing and MQTT publishing
