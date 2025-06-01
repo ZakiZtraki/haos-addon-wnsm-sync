@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.3.10] - 2025-06-01
+
+### Fixed
+- **MQTT Data Publishing**: Resolved "Skipping data point with missing fields" errors
+  - Fixed data format mismatch between API response processing and MQTT publishing
+  - Updated `process_bewegungsdaten_response()` to return data with `delta` fields required by MQTT publisher
+  - All processed data points now include the correct `delta`, `start`, and `timestamp` fields
+
+- **API Endpoint Usage**: Improved Wiener Netze Smart Meter API integration
+  - Enhanced `bewegungsdaten()` method to properly request 15-minute interval data using `valuetype=QUARTER_HOUR`
+  - Added fallback handling for different API parameter formats and library versions
+  - Better error handling for API calls with improved parameter name detection
+
+- **Data Granularity**: Enhanced 15-minute interval processing
+  - Changed daily data conversion from 24 hourly intervals to 96 15-minute intervals for better precision
+  - Improved even distribution of daily consumption values across 15-minute periods
+  - Each 15-minute interval now correctly represents 1/96th of the daily consumption
+
+### Changed
+- **Data Processing Pipeline**: Streamlined data flow from API to MQTT
+  - Removed unnecessary `sum` and `state` fields from processed data
+  - Standardized on `delta` field for all 15-minute consumption values
+  - Updated mock data generation to use the correct format
+
+### Technical Details
+- **Files Modified**:
+  - `wnsm_sync/sync_bewegungsdaten_to_ha.py`: Updated data processing and MQTT publishing logic
+  - `wnsm_sync/api/client.py`: Enhanced API parameter handling
+- **API Compatibility**: Works with both 15-minute API responses and daily data fallback
+- **MQTT Format**: All published messages now use consistent `{"delta": value, "timestamp": "..."}` format
+
 ## [0.3.9] - 2025-06-01
 
 ### Changes

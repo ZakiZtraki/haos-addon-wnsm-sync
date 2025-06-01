@@ -609,22 +609,25 @@ def fetch_bewegungsdaten(config):
         # Use the bewegungsdaten method to fetch data
         logger.info(f"Fetching bewegungsdaten for zaehlpunkt {zp}")
         try:
-            # Try to fetch with granularity parameter (for 15-min intervals)
+            # Import the constants to use the correct ValueType
+            from api import constants as const
+            
+            # Try to fetch with valuetype parameter for 15-min intervals
             try:
                 raw_data = client.bewegungsdaten(
-                    zaehlpunkt=zp,
+                    zaehlpunktnummer=zp,
                     date_from=date_from,
-                    date_to=date_until,
-                    granularity="QH"  # QH = Quarter Hour
+                    date_until=date_until,
+                    valuetype=const.ValueType.QUARTER_HOUR  # Request 15-minute intervals
                 )
-                logger.info("Successfully fetched data with granularity=QH parameter")
+                logger.info("Successfully fetched data with valuetype=QUARTER_HOUR parameter")
             except TypeError as e:
-                if "unexpected keyword argument 'granularity'" in str(e):
-                    logger.info("API doesn't support granularity parameter, trying without it")
+                if "unexpected keyword argument" in str(e):
+                    logger.info("API doesn't support valuetype parameter, trying with default parameters")
                     raw_data = client.bewegungsdaten(
-                        zaehlpunkt=zp,
+                        zaehlpunktnummer=zp,
                         date_from=date_from,
-                        date_to=date_until
+                        date_until=date_until
                     )
                 else:
                     raise
@@ -640,12 +643,20 @@ def fetch_bewegungsdaten(config):
         except TypeError as e:
             if "unexpected keyword argument" in str(e):
                 logger.info("Trying alternative parameter names for bewegungsdaten method")
-                # Try with zaehlpunktnummer parameter (older versions)
-                raw_data = client.bewegungsdaten(
-                    zp,  # positional argument
-                    date_from=date_from,
-                    date_to=date_until
-                )
+                # Try with positional arguments (older versions)
+                try:
+                    raw_data = client.bewegungsdaten(
+                        zp,  # positional argument
+                        date_from=date_from,
+                        date_until=date_until
+                    )
+                except TypeError:
+                    # Try with different parameter names
+                    raw_data = client.bewegungsdaten(
+                        zaehlpunkt=zp,
+                        date_from=date_from,
+                        date_until=date_until
+                    )
                 
                 # Process the data into the expected format
                 statistics = process_bewegungsdaten_response(raw_data, config)
@@ -733,7 +744,8 @@ def process_bewegungsdaten_response(raw_data, config=None):
         config: Configuration dictionary, used for fallback options
         
     Returns:
-        list: A list of dictionaries with standardized format
+        list: A list of dictionaries with standardized format for MQTT publishing
+              Each dictionary contains: start, delta, timestamp
     """
     # Default config if none provided
     if config is None:
@@ -750,13 +762,13 @@ def process_bewegungsdaten_response(raw_data, config=None):
             if 'data' in raw_data and isinstance(raw_data['data'], list):
                 logger.info(f"Processing data in format 1 with {len(raw_data['data'])} data points")
                 
-                # Convert each data point to the expected format
+                # Convert each data point to the expected format for MQTT
                 for point in raw_data['data']:
                     if isinstance(point, dict) and 'timestamp' in point and 'value' in point:
                         processed_data.append({
                             "start": point['timestamp'],
-                            "sum": float(point['value']),
-                            "state": float(point['value'])
+                            "delta": float(point['value']),  # Use delta for MQTT publishing
+                            "timestamp": point['timestamp']
                         })
             
             # Format 2: Dictionary with 'descriptor' and 'values' keys
@@ -782,21 +794,18 @@ def process_bewegungsdaten_response(raw_data, config=None):
                             logger.info(f"API data period: {descriptor['zeitpunktVon']} to {descriptor['zeitpunktBis']}")
                 
                 if isinstance(values, list):
-                    running_sum = 0
                     for value in values:
                         # Format 2.1: Dictionary with 'timestamp' and 'value' keys (15-min intervals)
                         if isinstance(value, dict) and 'timestamp' in value and 'value' in value:
                             value_float = float(value['value'])
-                            running_sum += value_float
                             processed_data.append({
                                 "start": value['timestamp'],
-                                "sum": running_sum,
-                                "state": value_float
+                                "delta": value_float,  # Use delta for MQTT publishing
+                                "timestamp": value['timestamp']
                             })
                         # Format 2.2: Dictionary with 'wert', 'zeitpunktVon', and 'zeitpunktBis' keys (daily data)
                         elif isinstance(value, dict) and 'wert' in value and 'zeitpunktVon' in value and 'zeitpunktBis' in value:
                             value_float = float(value['wert'])
-                            running_sum += value_float
                             
                             # Use zeitpunktVon as the timestamp
                             timestamp = value['zeitpunktVon']
@@ -804,34 +813,34 @@ def process_bewegungsdaten_response(raw_data, config=None):
                             # Log the daily data
                             logger.info(f"Processing daily data: {timestamp} to {value['zeitpunktBis']}, value: {value_float} kWh")
                             
-                            # Create 24 hourly entries to distribute the daily value
+                            # Create 96 15-minute entries to distribute the daily value (24 hours * 4 quarters = 96)
                             from datetime import datetime, timedelta
                             try:
                                 # Parse the timestamp
                                 dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
                                 
-                                # Calculate hourly value (divide by 24 for hourly distribution)
-                                hourly_value = value_float / 24
+                                # Calculate 15-minute value (divide by 96 for 15-minute distribution)
+                                quarter_hour_value = value_float / 96
                                 
-                                # Create 24 hourly entries
-                                for hour in range(24):
-                                    hour_dt = dt + timedelta(hours=hour)
-                                    hour_timestamp = hour_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+                                # Create 96 15-minute entries
+                                for quarter in range(96):
+                                    quarter_dt = dt + timedelta(minutes=quarter * 15)
+                                    quarter_timestamp = quarter_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
                                     
                                     processed_data.append({
-                                        "start": hour_timestamp,
-                                        "sum": running_sum - (value_float - (hourly_value * (hour + 1))),
-                                        "state": hourly_value
+                                        "start": quarter_timestamp,
+                                        "delta": quarter_hour_value,  # Use delta for MQTT publishing
+                                        "timestamp": quarter_timestamp
                                     })
                                 
-                                logger.info(f"Created {24} hourly entries for daily value {value_float} kWh")
+                                logger.info(f"Created {96} 15-minute entries for daily value {value_float} kWh")
                             except Exception as e:
-                                logger.error(f"Error creating hourly entries: {e}")
-                                # If we can't create hourly entries, just use the daily value
+                                logger.error(f"Error creating 15-minute entries: {e}")
+                                # If we can't create 15-minute entries, just use the daily value
                                 processed_data.append({
                                     "start": timestamp,
-                                    "sum": running_sum,
-                                    "state": value_float
+                                    "delta": value_float,  # Use delta for MQTT publishing
+                                    "timestamp": timestamp
                                 })
                         else:
                             logger.warning(f"Skipping invalid value item: {value}")
@@ -866,11 +875,10 @@ def process_bewegungsdaten_response(raw_data, config=None):
                                             pass
                                 
                                 if timestamp and value_num is not None:
-                                    running_sum += value_num
                                     processed_data.append({
                                         "start": timestamp,
-                                        "sum": running_sum,
-                                        "state": value_num
+                                        "delta": value_num,  # Use delta for MQTT publishing
+                                        "timestamp": timestamp
                                     })
         
         # Handle list response
@@ -899,11 +907,10 @@ def process_bewegungsdaten_response(raw_data, config=None):
                                 pass
                     
                     if timestamp and value_num is not None:
-                        running_sum += value_num
                         processed_data.append({
                             "start": timestamp,
-                            "sum": running_sum,
-                            "state": value_num
+                            "delta": value_num,  # Use delta for MQTT publishing
+                            "timestamp": timestamp
                         })
         
         logger.info(f"Processed {len(processed_data)} data points")
@@ -944,17 +951,15 @@ def _generate_mock_data(date_from, date_until):
     current_date = datetime.combine(date_from, datetime.min.time())
     end_date = datetime.combine(date_until, datetime.max.time())
     
-    running_sum = 0
     while current_date <= end_date:
         # Generate a random value between 0.1 and 1.0
         import random
         value = round(random.uniform(0.1, 1.0), 3)
-        running_sum += value
         
         mock_data.append({
             "start": current_date.strftime("%Y-%m-%dT%H:%M:%S.000Z"),
-            "sum": running_sum,
-            "state": value
+            "delta": value,  # Use delta for MQTT publishing
+            "timestamp": current_date.strftime("%Y-%m-%dT%H:%M:%S.000Z")
         })
         
         # Increment by 15 minutes
