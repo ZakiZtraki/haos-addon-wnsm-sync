@@ -1,7 +1,23 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [0.3.11](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v1.5.1...v0.3.11) (2025-06-01)
+
+
+### Features
+
+* enhance debugging and add configuration diagnostic script ([91240bf](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/91240bf7dcf985760bc45683a65fc52f5c3eb4b1))
+* Implement fix for 15-minute delta values issue in Wiener Netze Smart Meter add-on ([c7e0c8f](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/c7e0c8f692d641d91cebb08b0222729a8845c41e))
+* Implement Home Assistant secrets support for secure credential management ([f31320f](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/f31320f2db92bf2031d87117b39315517e1f6d98))
+* Implement Home Assistant secrets.yaml support for secure credential management ([c33283b](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/c33283bb452c1f437c6f5c0f9da7f920abda3a0e))
+* update add-on icon ([94d43a7](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/94d43a7fb83da0f33f1df02cbc0bcd0b69062ca7))
+
+
+### Bug Fixes
+
+* **ci:** add write permissions for GitHub Actions to push releases ([bf6b73f](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/bf6b73f1522517c89ef26aafca864c148b9deeba))
+* Correct 15-minute delta values aggregation and update package name ([269367b](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/269367b502f31622f7de2ff66d7e9735bf1a9447))
 
 ## [0.3.10] - 2025-06-01
 
