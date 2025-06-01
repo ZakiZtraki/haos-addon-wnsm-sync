@@ -25,34 +25,33 @@ mqtt_host: "192.168.1.100"
 awattar_api_key: "your-awattar-api-key"
 ```
 
-### 2. Configure the add-on using secret references
+### 2. Enable secrets mode in add-on configuration
 
-In the add-on configuration tab, use the `!secret` syntax:
+In the add-on configuration tab, enable "Use Secrets" and leave credential fields empty:
 
 ```yaml
-WNSM_USERNAME: "!secret wnsm_username"
-WNSM_PASSWORD: "!secret wnsm_password"
-WNSM_ZP: "!secret wnsm_zp"
+USE_SECRETS: true
+WNSM_USERNAME: ""
+WNSM_PASSWORD: ""
+ZP: ""
 MQTT_HOST: "core-mosquitto"
 MQTT_PORT: 1883
-MQTT_USERNAME: "!secret mqtt_username"
-MQTT_PASSWORD: "!secret mqtt_password"
+MQTT_USERNAME: ""
+MQTT_PASSWORD: ""
 MQTT_TOPIC: "smartmeter/energy/15min"
 UPDATE_INTERVAL: 86400
 HISTORY_DAYS: 7
 ```
 
-### 3. Alternative: Mix secrets with direct values
+### 3. Alternative: Automatic secrets fallback
 
-You can mix secret references with direct configuration:
+If you don't enable "Use Secrets" but leave credential fields empty, the add-on will automatically try to load them from secrets.yaml:
 
 ```yaml
-# Use secrets for sensitive data
-WNSM_USERNAME: "!secret wnsm_username"
-WNSM_PASSWORD: "!secret wnsm_password"
-WNSM_ZP: "!secret wnsm_zp"
-
-# Use direct values for non-sensitive settings
+USE_SECRETS: false
+WNSM_USERNAME: ""  # Will try to load from secrets.yaml
+WNSM_PASSWORD: ""  # Will try to load from secrets.yaml
+ZP: ""             # Will try to load from secrets.yaml
 MQTT_HOST: "core-mosquitto"
 MQTT_PORT: 1883
 MQTT_TOPIC: "smartmeter/energy/15min"
@@ -107,12 +106,13 @@ mqtt_pass: "mqtt_secure_password"
 
 **Add-on configuration:**
 ```yaml
-WNSM_USERNAME: "!secret wnsm_user"
-WNSM_PASSWORD: "!secret wnsm_pass"
-WNSM_ZP: "!secret wnsm_meter"
+USE_SECRETS: true
+WNSM_USERNAME: ""
+WNSM_PASSWORD: ""
+ZP: ""
 MQTT_HOST: "core-mosquitto"
-MQTT_USERNAME: "!secret mqtt_user"
-MQTT_PASSWORD: "!secret mqtt_pass"
+MQTT_USERNAME: ""
+MQTT_PASSWORD: ""
 MQTT_TOPIC: "smartmeter/energy/15min"
 UPDATE_INTERVAL: 86400
 HISTORY_DAYS: 1

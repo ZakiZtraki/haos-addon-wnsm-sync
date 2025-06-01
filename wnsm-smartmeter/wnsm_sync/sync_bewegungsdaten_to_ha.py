@@ -88,11 +88,10 @@ def load_config():
     """Load configuration from options.json or environment variables with secrets.yaml support."""
     config = {}
     
-    # Load secrets first
-    secrets = load_secrets()
-    
     # First try to load from options.json (preferred method for Home Assistant addons)
     options_file = "/data/options.json"
+    use_secrets = False
+    
     if os.path.exists(options_file):
         try:
             logger.info(f"Loading configuration from {options_file}")
@@ -100,11 +99,17 @@ def load_config():
                 options = json.loads(f.read())
                 logger.debug(f"Loaded options: {', '.join(options.keys())}")
                 
+                # Check if secrets mode is enabled
+                use_secrets = options.get("USE_SECRETS", False)
+                if use_secrets:
+                    logger.info("Secrets mode enabled - will load credentials from secrets.yaml")
+                
                 # Map options.json keys to our config keys
                 key_mapping = {
                     "WNSM_USERNAME": "USERNAME",
                     "WNSM_PASSWORD": "PASSWORD",
                     "WNSM_ZP": "ZP",
+                    "ZP": "ZP",  # Support both WNSM_ZP and ZP
                     "MQTT_HOST": "MQTT_HOST",
                     "MQTT_PORT": "MQTT_PORT",
                     "MQTT_USERNAME": "MQTT_USERNAME",
@@ -119,23 +124,59 @@ def load_config():
                     "DEBUG": "DEBUG"
                 }
                 
-                # Transfer all options to our config using the mapping and resolve secrets
+                # Transfer all options to our config using the mapping
                 for options_key, config_key in key_mapping.items():
-                    if options_key in options and options[options_key] is not None:
-                        raw_value = options[options_key]
-                        resolved_value = resolve_secret_value(raw_value, secrets)
-                        config[config_key] = resolved_value
+                    if options_key in options and options[options_key] is not None and options[options_key] != "":
+                        config[config_key] = options[options_key]
                         
                         # Log without revealing sensitive values
                         if 'PASSWORD' in config_key or 'SECRET' in config_key:
                             logger.debug(f"Using {options_key} from options.json for {config_key} (value hidden)")
                         else:
-                            logger.debug(f"Using {options_key} from options.json for {config_key}: {resolved_value}")
+                            logger.debug(f"Using {options_key} from options.json for {config_key}: {options[options_key]}")
                 
         except Exception as e:
             logger.error(f"Failed to load options.json: {e}")
     else:
         logger.warning(f"Options file {options_file} not found, falling back to environment variables")
+    
+    # Load secrets if enabled or if required credentials are missing
+    secrets = {}
+    missing_required = not all(key in config and config[key] for key in ["USERNAME", "PASSWORD", "ZP"])
+    
+    if use_secrets or missing_required:
+        logger.info("Loading secrets from secrets.yaml")
+        secrets = load_secrets()
+        
+        # Define secret mappings
+        secret_mappings = {
+            "USERNAME": ["wnsm_username", "username"],
+            "PASSWORD": ["wnsm_password", "password"],
+            "ZP": ["wnsm_zp", "zp", "wnsm_meter", "meter"],
+            "MQTT_USERNAME": ["mqtt_username", "mqtt_user"],
+            "MQTT_PASSWORD": ["mqtt_password", "mqtt_pass"],
+            "MQTT_HOST": ["mqtt_host", "mqtt_broker"]
+        }
+        
+        # Apply secrets based on mode
+        if use_secrets and secrets:
+            # USE_SECRETS=true: Override all mapped values with secrets
+            for config_key, secret_names in secret_mappings.items():
+                for secret_name in secret_names:
+                    if secret_name in secrets:
+                        config[config_key] = secrets[secret_name]
+                        logger.debug(f"Using secret '{secret_name}' for {config_key}")
+                        break
+        elif missing_required and secrets:
+            # Automatic fallback: Only fill missing required credentials
+            for config_key in ["USERNAME", "PASSWORD", "ZP"]:
+                if config_key not in config or not config[config_key]:
+                    secret_names = secret_mappings.get(config_key, [])
+                    for secret_name in secret_names:
+                        if secret_name in secrets:
+                            config[config_key] = secrets[secret_name]
+                            logger.debug(f"Using secret '{secret_name}' for missing {config_key}")
+                            break
     
     # Debug: Print all environment variables to help diagnose issues
     logger.debug("Environment variables:")

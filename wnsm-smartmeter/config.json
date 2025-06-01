@@ -20,6 +20,7 @@
     "panel_icon": "mdi:flash",
     "codenotary": "admins@zenmedia.live",
     "options": {
+        "USE_SECRETS": false,
         "WNSM_USERNAME": "",
         "WNSM_PASSWORD": "",
         "ZP": "",
@@ -28,9 +29,10 @@
         "HISTORY_DAYS": 1
     },
     "schema": {
-        "WNSM_USERNAME": "str",
-        "WNSM_PASSWORD": "password",
-        "ZP": "str",
+        "USE_SECRETS": "bool?",
+        "WNSM_USERNAME": "str?",
+        "WNSM_PASSWORD": "password?",
+        "ZP": "str?",
         "MQTT_HOST": "str",
         "MQTT_PORT": "int?",
         "MQTT_USERNAME": "str?",
