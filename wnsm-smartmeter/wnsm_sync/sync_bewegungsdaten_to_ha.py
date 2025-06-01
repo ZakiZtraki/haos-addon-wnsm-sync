@@ -221,14 +221,15 @@ def publish_mqtt_discovery(config):
         device_id = config["ZP"].lower().replace("0", "")
         discovery_topic = f"homeassistant/sensor/wnsm_sync_{device_id}/config"
         discovery_payload = {
-            "name": "Energy Consumption",  # Changed to a simpler name
+            "name": "WNSM 15min Energy",  # Clear name indicating 15-minute intervals
             "state_topic": config["MQTT_TOPIC"],
             "unit_of_measurement": "kWh",
             "device_class": "energy",
-            "state_class": "total_increasing",
+            "state_class": "measurement",  # Changed to measurement for delta values
             "unique_id": f"wnsm_sync_energy_sensor_{device_id}",
-            "value_template": "{{ value_json.value }}",
-            "timestamp_template": "{{ value_json.timestamp }}",
+            "value_template": "{{ value_json.delta }}",  # Changed to use delta field
+            "json_attributes_topic": config["MQTT_TOPIC"],
+            "json_attributes_template": "{{ {'timestamp': value_json.timestamp} | tojson }}",
             "device": {
                 "identifiers": [f"wnsm_sync_{device_id}"],
                 "name": "Wiener Netze Smart Meter",  # This is the device name
@@ -276,92 +277,51 @@ def publish_mqtt_message(topic, payload, config):
         return False
 
 def publish_mqtt_data(statistics, config):
-    """Publish energy data to MQTT."""
+    """Publish energy data to MQTT as individual 15-minute deltas."""
     if not statistics:
         logger.warning("No statistics to publish")
         return
 
-    # The statistics should already be in the correct format after processing
-    # But let's add a check just in case
-    if isinstance(statistics, dict):
-        logger.info(f"Fetched data in unexpected format: {type(statistics)}")
-        # Try to process it using our processor function
-        statistics = process_bewegungsdaten_response(statistics, config)
-
-    logger.info(f"Publishing {len(statistics)} entries to MQTT")
+    logger.info(f"Publishing {len(statistics)} 15-minute intervals to MQTT")
 
     # Sort statistics by timestamp to ensure proper ordering
     statistics.sort(key=lambda x: x.get('start', ''))
     
-    # Group statistics by day to avoid overwhelming Home Assistant
-    from datetime import datetime
-    from collections import defaultdict
-    
-    # Group by day
-    days_data = defaultdict(list)
-    for s in statistics:
-        if not isinstance(s, dict):
-            logger.warning(f"Skipping invalid data point (not a dictionary): {s}")
+    # Publish each 15-minute interval as a separate MQTT message
+    total_published = 0
+    for entry in statistics:
+        if not isinstance(entry, dict):
+            logger.warning(f"Skipping invalid data point (not a dictionary): {entry}")
             continue
             
-        if 'start' not in s or 'sum' not in s:
-            logger.warning(f"Skipping data point with missing fields: {s}")
+        if 'start' not in entry or 'delta' not in entry:
+            logger.warning(f"Skipping data point with missing fields: {entry}")
             continue
         
-        # Extract the date part (YYYY-MM-DD) from the timestamp
         try:
-            date_part = s['start'][:10]  # Extract YYYY-MM-DD part
-            days_data[date_part].append(s)
-        except Exception as e:
-            logger.warning(f"Error extracting date from timestamp {s['start']}: {e}")
-            continue
-    
-    # Process each day's data
-    total_published = 0
-    for day, day_stats in days_data.items():
-        logger.info(f"Publishing {len(day_stats)} entries for day {day}")
-        
-        # Publish a maximum of 50 entries per day to avoid overwhelming Home Assistant
-        # This will sample the data if there are too many points
-        max_entries = 50
-        if len(day_stats) > max_entries:
-            # Sample the data to get a representative set
-            step = len(day_stats) // max_entries
-            sampled_stats = day_stats[::step][:max_entries]
-            logger.info(f"Sampling {len(day_stats)} entries down to {len(sampled_stats)} for day {day}")
-            day_stats = sampled_stats
-        
-        # Publish each entry for this day
-        for s in day_stats:
-            topic = f"{config['MQTT_TOPIC']}/{s['start'][:16]}"  # e.g. smartmeter/energy/state/2025-05-16T00:15
+            # Create the MQTT payload with the 15-minute delta value
             payload = {
-                "value": s["sum"],
-                "timestamp": s["start"]
+                "delta": entry["delta"],  # 15-minute consumption in kWh
+                "timestamp": entry["timestamp"]
             }
             
-            publish_mqtt_message(topic, payload, config)
+            # Publish to the main MQTT topic
+            # Home Assistant will receive each 15-minute interval separately
+            publish_mqtt_message(config["MQTT_TOPIC"], payload, config)
             total_published += 1
+            
+            logger.debug(f"Published 15-min interval: {entry['timestamp']} = {entry['delta']} kWh")
+            
+        except Exception as e:
+            logger.warning(f"Error publishing entry {entry}: {e}")
+            continue
     
-    logger.info(f"Published a total of {total_published} entries across {len(days_data)} days")
-
-    # Publish latest value to main topic for current state
-    try:
-        if statistics and len(statistics) > 0:
-            latest = statistics[-1]
-            publish_mqtt_message(
-                config["MQTT_TOPIC"],
-                {
-                    "value": latest["sum"],
-                    "timestamp": latest["start"]
-                },
-                config
-            )
-            logger.info("✅ All entries published to MQTT")
-        else:
-            logger.warning("No valid statistics to publish as latest value")
-    except Exception as e:
-        logger.error(f"Failed to publish latest value: {e}")
-        logger.exception(e)  # Log the full exception traceback
+    logger.info(f"✅ Published {total_published} 15-minute intervals to MQTT topic: {config['MQTT_TOPIC']}")
+    
+    # Log summary statistics
+    if statistics:
+        total_consumption = sum(s.get('delta', 0) for s in statistics)
+        logger.info(f"Total consumption for period: {total_consumption:.3f} kWh across {len(statistics)} intervals")
 
 def main():
     """Main function to run the sync process."""
@@ -416,8 +376,7 @@ def main():
         logger.error(f"Failed to fetch data: {e}")
         sys.exit(1)
     
-    # Process the data
-    total = Decimal(0)
+    # Process the data - create individual 15-minute delta values
     statistics = []
     
     logger.info(f"Processing {len(bewegungsdaten.get('values', []))} data points")
@@ -425,13 +384,15 @@ def main():
     for entry in bewegungsdaten.get("values", []):
         try:
             ts = datetime.fromisoformat(entry["zeitpunktVon"].replace("Z", "+00:00"))
-            value_kwh = Decimal(str(entry["wert"]))
-            total += value_kwh
+            # Convert wert to float - this is the 15-minute consumption delta
+            value_kwh = float(entry["wert"])
+            
             statistics.append({
                 "start": ts.isoformat(),
-                "sum": float(total),
-                "state": float(value_kwh)
+                "delta": value_kwh,  # This is the actual 15-minute consumption
+                "timestamp": ts.isoformat()
             })
+            logger.debug(f"Processed 15-min interval: {ts.isoformat()} = {value_kwh} kWh")
         except (KeyError, ValueError) as e:
             logger.warning(f"Error processing entry {entry}: {e}")
     

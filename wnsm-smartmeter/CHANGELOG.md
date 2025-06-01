@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0] - 2025-05-31
+
+### Changes
+
+- Update version to 0.3.0
+
+
+## [0.2.8] - 2025-05-31
+
+### Changes
+
+- Update version to 0.2.8
+
+
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 ### [1.0.2](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v1.5.1...v1.0.2) (2025-05-31)

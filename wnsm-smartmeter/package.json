@@ -5,9 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "pre-release": "copy CHANGELOG.md ..\\CHANGELOG.md",
-    "build-addon": "npm run pre-release && docker build -t wnsm_smartmeter:latest .",
-    "release": "npm run pre-release && standard-version",
+    "update-version": "node update-version.js",
+    "update-version:minor": "node update-version.js minor",
+    "update-version:major": "node update-version.js major",
+    "build-addon": "docker build -t wnsm_smartmeter:latest .",
+    "release": "npm run update-version && git add config.json CHANGELOG.md ../CHANGELOG.md && git commit -m \"chore(release): update version\"",
     "release:full": "npm run release && git push --follow-tags",
     "release:build": "npm run release:full && npm run build-addon"
   },
@@ -23,9 +25,5 @@
   },
   "homepage": "https://github.com/ZakiZtraki/haos-addon-wnsm-sync#readme",
   "devDependencies": {
-    "standard-version": "^9.5.0"
-  },
-  "standard-version": {
-    "changelogFile": "../CHANGELOG.md"
   }
 }
