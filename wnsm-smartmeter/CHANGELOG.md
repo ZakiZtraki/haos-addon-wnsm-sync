@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.5] - 2025-06-01
+
+### Changes
+
+- Update version to 0.3.5
+
+
 ## [0.3.4] - 2025-06-01
 
 ### Changes
