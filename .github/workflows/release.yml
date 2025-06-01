@@ -101,5 +101,5 @@ jobs:
     - name: Push changes
       run: |
         git add .
-        git commit --amend --no-edit
-        git push --follow-tags origin main
+        git commit -m "chore(release): update version and changelog for ${{ steps.version.outputs.version }}"
+        git push origin main --follow-tags
