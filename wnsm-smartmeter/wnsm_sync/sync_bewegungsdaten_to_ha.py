@@ -608,60 +608,61 @@ def fetch_bewegungsdaten(config):
         
         # Use the bewegungsdaten method to fetch data
         logger.info(f"Fetching bewegungsdaten for zaehlpunkt {zp}")
+        
+        # Try different method signatures based on the vienna-smartmeter library
+        raw_data = None
+        
+        # Method 1: Try the standard signature from vienna-smartmeter library
         try:
-            # Import the constants to use the correct ValueType
-            from .api import constants as const
+            logger.info("Trying standard bewegungsdaten method signature")
+            raw_data = client.bewegungsdaten(
+                date_from=date_from,
+                date_to=date_until,
+                zaehlpunkt=zp
+            )
+            logger.info("Successfully fetched data with standard signature")
+        except TypeError as e:
+            logger.info(f"Standard signature failed: {e}")
             
-            # Try to fetch with valuetype parameter for 15-min intervals
+            # Method 2: Try with different parameter names
             try:
+                logger.info("Trying alternative parameter names")
                 raw_data = client.bewegungsdaten(
-                    zaehlpunktnummer=zp,
                     date_from=date_from,
                     date_until=date_until,
-                    valuetype=const.ValueType.QUARTER_HOUR  # Request 15-minute intervals
+                    zaehlpunkt=zp
                 )
-                logger.info("Successfully fetched data with valuetype=QUARTER_HOUR parameter")
+                logger.info("Successfully fetched data with alternative parameter names")
             except TypeError as e:
-                if "unexpected keyword argument" in str(e):
-                    logger.info("API doesn't support valuetype parameter, trying with default parameters")
-                    raw_data = client.bewegungsdaten(
-                        zaehlpunktnummer=zp,
-                        date_from=date_from,
-                        date_until=date_until
-                    )
-                else:
-                    raise
-            
-            # Log the structure of the returned data for debugging
-            logger.debug(f"Raw data structure: {type(raw_data)}")
-            if isinstance(raw_data, dict):
-                logger.debug(f"Raw data keys: {raw_data.keys()}")
+                logger.info(f"Alternative parameter names failed: {e}")
                 
-            # Process the data into the expected format
-            statistics = process_bewegungsdaten_response(raw_data, config)
-            
-        except TypeError as e:
-            if "unexpected keyword argument" in str(e):
-                logger.info("Trying alternative parameter names for bewegungsdaten method")
-                # Try with positional arguments (older versions)
+                # Method 3: Try positional arguments
                 try:
-                    raw_data = client.bewegungsdaten(
-                        zp,  # positional argument
-                        date_from=date_from,
-                        date_until=date_until
-                    )
-                except TypeError:
-                    # Try with different parameter names
-                    raw_data = client.bewegungsdaten(
-                        zaehlpunkt=zp,
-                        date_from=date_from,
-                        date_until=date_until
-                    )
-                
-                # Process the data into the expected format
-                statistics = process_bewegungsdaten_response(raw_data, config)
-            else:
-                raise
+                    logger.info("Trying positional arguments")
+                    raw_data = client.bewegungsdaten(date_from, date_until, zp)
+                    logger.info("Successfully fetched data with positional arguments")
+                except TypeError as e:
+                    logger.info(f"Positional arguments failed: {e}")
+                    
+                    # Method 4: Try minimal parameters
+                    try:
+                        logger.info("Trying minimal parameters (date_from, date_to)")
+                        raw_data = client.bewegungsdaten(date_from, date_until)
+                        logger.info("Successfully fetched data with minimal parameters")
+                    except Exception as e:
+                        logger.error(f"All method signatures failed: {e}")
+                        raise
+        
+        if raw_data is None:
+            raise Exception("Could not fetch data with any method signature")
+            
+        # Log the structure of the returned data for debugging
+        logger.debug(f"Raw data structure: {type(raw_data)}")
+        if isinstance(raw_data, dict):
+            logger.debug(f"Raw data keys: {raw_data.keys()}")
+            
+        # Process the data into the expected format
+        statistics = process_bewegungsdaten_response(raw_data, config)
         
         return statistics
     except TypeError as e:
