@@ -1,11 +1,25 @@
 # Changelog
 
-## [0.3.8] - 2025-06-01
+## [0.3.9] - 2025-06-01
 
 ### Changes
 
-- Update version to 0.3.8
+- Update version to 0.3.9
 
+
+## [0.3.8] - 2025-06-01
+
+### Added
+- **Enhanced Debugging**: Improved configuration loading diagnostics
+  - Added detailed logging for add-on configuration values
+  - Better secrets loading status reporting
+  - Configuration diagnostic script (`diagnose_config.py`)
+
+### Changed
+- **Icon**: Updated add-on icon for better visual identification
+
+### Fixed
+- **Secrets Loading**: Enhanced error reporting for secrets configuration issues
 
 ## [0.3.7] - 2025-06-01
 

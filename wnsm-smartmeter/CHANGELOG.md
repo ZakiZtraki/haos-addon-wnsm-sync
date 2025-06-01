@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.9] - 2025-06-01
+
+### Changes
+
+- Update version to 0.3.9
+
+
 ## [0.3.8] - 2025-06-01
 
 ### Added
