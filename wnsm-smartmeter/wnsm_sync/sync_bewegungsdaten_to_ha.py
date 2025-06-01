@@ -8,6 +8,8 @@ import sys
 import json
 import logging
 import time
+import yaml
+import re
 from datetime import datetime, timedelta, date
 from decimal import Decimal
 import paho.mqtt.publish as publish
@@ -30,9 +32,64 @@ if log_level == logging.DEBUG:
 
 # === CONFIGURATION ===
 # Configuration from options.json with fallbacks to environment variables
+def load_secrets():
+    """Load secrets from Home Assistant's secrets.yaml file."""
+    secrets = {}
+    secrets_paths = [
+        "/config/secrets.yaml",  # Home Assistant config directory
+        "/homeassistant/secrets.yaml",  # Alternative path
+        "/data/secrets.yaml"  # Add-on data directory (fallback)
+    ]
+    
+    for secrets_path in secrets_paths:
+        if os.path.exists(secrets_path):
+            try:
+                logger.info(f"Loading secrets from {secrets_path}")
+                with open(secrets_path, 'r') as f:
+                    secrets = yaml.safe_load(f) or {}
+                logger.info(f"Loaded {len(secrets)} secrets from {secrets_path}")
+                return secrets
+            except Exception as e:
+                logger.warning(f"Failed to load secrets from {secrets_path}: {e}")
+                continue
+    
+    logger.info("No secrets.yaml file found, secrets support disabled")
+    return secrets
+
+
+def resolve_secret_value(value, secrets):
+    """Resolve secret references in configuration values.
+    
+    Supports the following formats:
+    - !secret secret_name
+    - "!secret secret_name"
+    - Simple string values (returned as-is)
+    """
+    if not isinstance(value, str):
+        return value
+    
+    # Match !secret references (with or without quotes)
+    secret_pattern = r'^!secret\s+(\w+)$'
+    match = re.match(secret_pattern, value.strip())
+    
+    if match:
+        secret_name = match.group(1)
+        if secret_name in secrets:
+            logger.debug(f"Resolved secret reference: !secret {secret_name}")
+            return secrets[secret_name]
+        else:
+            logger.warning(f"Secret '{secret_name}' not found in secrets.yaml")
+            return value
+    
+    return value
+
+
 def load_config():
-    """Load configuration from options.json or environment variables."""
+    """Load configuration from options.json or environment variables with secrets.yaml support."""
     config = {}
+    
+    # Load secrets first
+    secrets = load_secrets()
     
     # First try to load from options.json (preferred method for Home Assistant addons)
     options_file = "/data/options.json"
@@ -62,11 +119,18 @@ def load_config():
                     "DEBUG": "DEBUG"
                 }
                 
-                # Transfer all options to our config using the mapping
+                # Transfer all options to our config using the mapping and resolve secrets
                 for options_key, config_key in key_mapping.items():
                     if options_key in options and options[options_key] is not None:
-                        config[config_key] = options[options_key]
-                        logger.debug(f"Using {options_key} from options.json for {config_key}")
+                        raw_value = options[options_key]
+                        resolved_value = resolve_secret_value(raw_value, secrets)
+                        config[config_key] = resolved_value
+                        
+                        # Log without revealing sensitive values
+                        if 'PASSWORD' in config_key or 'SECRET' in config_key:
+                            logger.debug(f"Using {options_key} from options.json for {config_key} (value hidden)")
+                        else:
+                            logger.debug(f"Using {options_key} from options.json for {config_key}: {resolved_value}")
                 
         except Exception as e:
             logger.error(f"Failed to load options.json: {e}")

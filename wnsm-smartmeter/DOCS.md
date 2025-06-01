@@ -19,6 +19,46 @@ This add-on integrates your Wiener Netze Smart Meter data with Home Assistant vi
 | WNSM_PASSWORD | Your Wiener Netze portal password |
 | ZP | Your Zählpunkt (meter point number) |
 
+### Using Home Assistant Secrets
+
+This add-on supports Home Assistant's `secrets.yaml` file for storing sensitive information. Instead of entering credentials directly in the add-on configuration, you can reference secrets.
+
+#### Step 1: Add secrets to your `secrets.yaml` file
+
+Edit your Home Assistant `secrets.yaml` file (located in `/config/secrets.yaml`) and add your credentials:
+
+```yaml
+# Wiener Netze Smart Meter credentials
+wnsm_username: "your-username@example.com"
+wnsm_password: "your-secure-password"
+wnsm_zp: "AT0030000000000000000000012345678"
+
+# MQTT credentials (if using external MQTT broker)
+mqtt_username: "your-mqtt-username"
+mqtt_password: "your-mqtt-password"
+```
+
+#### Step 2: Reference secrets in add-on configuration
+
+In the add-on configuration tab, use the `!secret` syntax to reference your secrets:
+
+```yaml
+WNSM_USERNAME: "!secret wnsm_username"
+WNSM_PASSWORD: "!secret wnsm_password"
+ZP: "!secret wnsm_zp"
+MQTT_USERNAME: "!secret mqtt_username"
+MQTT_PASSWORD: "!secret mqtt_password"
+```
+
+#### Benefits of using secrets:
+
+- **Centralized management**: All sensitive data in one place
+- **Security**: Credentials not visible in add-on configuration UI
+- **Reusability**: Same secrets can be used across multiple add-ons
+- **Version control**: You can safely commit configuration files without exposing credentials
+
+> 📖 **For detailed examples and troubleshooting**, see [SECRETS_EXAMPLE.md](SECRETS_EXAMPLE.md)
+
 ### MQTT parameters:
 
 | Parameter | Description | Default |
