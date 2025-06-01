@@ -1,6 +1,6 @@
 {
   "name": "haos-addon-wnsm-sync",
-  "version": "0.3.18",
+  "version": "0.3.19",
   "description": "Wiener Netze Smart Meter Home Assistant Add-on",
   "scripts": {
     "commit": "cz",

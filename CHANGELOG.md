@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.19](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v1.5.1...v0.3.19) (2025-06-01)
+
+
+### Features
+
+* **ci:** add Docker container building and publishing to release workflow ([0a16d5c](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/0a16d5c548a147dfe22558353b9379bae43e114d))
+* enhance debugging and add configuration diagnostic script ([91240bf](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/91240bf7dcf985760bc45683a65fc52f5c3eb4b1))
+* Implement fix for 15-minute delta values issue in Wiener Netze Smart Meter add-on ([c7e0c8f](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/c7e0c8f692d641d91cebb08b0222729a8845c41e))
+* Implement Home Assistant secrets support for secure credential management ([f31320f](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/f31320f2db92bf2031d87117b39315517e1f6d98))
+* Implement Home Assistant secrets.yaml support for secure credential management ([c33283b](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/c33283bb452c1f437c6f5c0f9da7f920abda3a0e))
+* **statistics:** implement HA  REST API for historical statistics and timestamped MQTT fallback ([4a9349b](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/4a9349bbe693fdcc731579f07d175daa229405ff))
+* update add-on icon ([94d43a7](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/94d43a7fb83da0f33f1df02cbc0bcd0b69062ca7))
+
+
+### Bug Fixes
+
+* **api:** fix bewegungsdaten method signature compatibility with vienna-smartmeter library ([8a41597](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/8a41597aac82b94e23c210eff905e4960c38b63d))
+* **ci:** add write permissions for GitHub Actions to push releases ([bf6b73f](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/bf6b73f1522517c89ef26aafca864c148b9deeba))
+* **ci:** convert repository owner to lowercase for Docker registry compatibility ([aab889d](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/aab889da3b05170a9fd7b1f54d6dcf5716a0c19d))
+* Correct 15-minute delta values aggregation and update package name ([269367b](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/269367b502f31622f7de2ff66d7e9735bf1a9447))
+* **docker:** add build dependencies for lxml compilation on ARM platforms ([82f93c6](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/82f93c6bfea0a1165cd1d7963221d93448460884))
+* **docker:** limit build to stable platforms (amd64, arm64) due to lxml compilation issues ([c31b03e](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/c31b03e0a5d49d8111080181db5e8191f63f1cd5))
+* **imports:** fix module import errors by using relative imports and adding missing __init__.py ([a94d9a0](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/a94d9a0df0c277d0f3926079a3bed719d634000f))
+* **mqtt:** fix state class to measurement and remove unused REST API function ([9751c0b](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/9751c0b9dd2342b6ad97d34ab1274b2a602d41d9))
+* **mqtt:** implement proper energy sensor with total state class and running totals ([8ad1862](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/8ad18627499e877e73aa921db0bf0f86cb11a880))
+
 ### [0.3.18](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v1.5.1...v0.3.18) (2025-06-01)
 
 
