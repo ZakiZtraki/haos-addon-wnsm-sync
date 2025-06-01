@@ -458,8 +458,8 @@ def main():
     
     # Import here to avoid early import errors
     try:
-        from api.client import Smartmeter
-        from api import constants as const
+        from .api.client import Smartmeter
+        from .api import constants as const
     except ImportError as e:
         logger.critical(f"Failed to import required modules: {e}")
         sys.exit(1)
@@ -610,7 +610,7 @@ def fetch_bewegungsdaten(config):
         logger.info(f"Fetching bewegungsdaten for zaehlpunkt {zp}")
         try:
             # Import the constants to use the correct ValueType
-            from api import constants as const
+            from .api import constants as const
             
             # Try to fetch with valuetype parameter for 15-min intervals
             try:
