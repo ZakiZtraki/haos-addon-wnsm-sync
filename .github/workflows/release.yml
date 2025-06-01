@@ -15,6 +15,9 @@ on:
         - minor
         - major
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
