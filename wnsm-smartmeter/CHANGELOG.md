@@ -2,36 +2,56 @@
 
 ## [0.3.5] - 2025-06-01
 
-### Changes
+### Added
+- **Home Assistant Secrets Support**: Complete implementation of secrets.yaml integration
+  - Added `USE_SECRETS` configuration option for explicit secrets mode
+  - Automatic fallback to secrets when credentials are missing
+  - Support for multiple secret naming conventions (e.g., `wnsm_username`, `username`)
+  - PyYAML dependency for secrets file parsing
 
-- Update version to 0.3.5
+### Changed
+- **Configuration Schema**: Made credential fields optional (`str?`) to support secrets mode
+- **Configuration Loading**: Enhanced logic to handle secrets, direct values, and automatic fallback
+- **Documentation**: Updated DOCS.md with comprehensive secrets usage instructions
+
+### Added Files
+- `SECRETS_EXAMPLE.md`: Detailed examples and troubleshooting guide
+- `test_new_secrets_approach.py`: Comprehensive test suite for secrets functionality
+- `SECRETS_SOLUTION_SUMMARY.md`: Technical implementation documentation
+
+### Security
+- Credentials no longer visible in add-on configuration UI when using secrets
+- Sensitive values masked in logs
+- Centralized credential management through `/config/secrets.yaml`
 
 
 ## [0.3.4] - 2025-06-01
 
-### Changes
+### Fixed
+- **Repository Naming**: Resolved "Dev" naming issue in add-on display
+  - Fixed `package-lock.json` references from `haos-addon-wnsm-dev` to `haos-addon-wnsm-sync`
+  - Updated README.md repository URL from dev to main repository
+  - Corrected Home Assistant add-on repository badge link
 
-- Update version to 0.3.4
+### Changed
+- All repository references now point to the main repository instead of dev fork
 
 
 ## [0.3.3] - 2025-06-01
 
-### Changes
-
+### Changed
 - Update version to 0.3.3
 
 
 ## [0.3.2] - 2025-06-01
 
-### Changes
-
+### Changed
 - Update version to 0.3.2
 
 
 ## [0.3.1] - 2025-06-01
 
-### Changes
-
+### Changed
 - Update version to 0.3.1
 
 
