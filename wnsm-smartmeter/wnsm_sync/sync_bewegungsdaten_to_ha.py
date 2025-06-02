@@ -389,37 +389,45 @@ def publish_mqtt_discovery(config):
         logger.error(f"Failed to publish MQTT discovery: {e}")
 
 
-def publish_mqtt_message(topic, payload, config):
-    """Publish a message to MQTT with appropriate configuration."""
-    try:
-        # Always use direct MQTT connection
-        import paho.mqtt.publish as publish
+def publish_mqtt_message(topic, payload, config, retry_count=3):
+    """Publish a message to MQTT with appropriate configuration and retry logic."""
+    import paho.mqtt.publish as publish
+    
+    # Extract host and port
+    mqtt_host = config.get("MQTT_HOST", "localhost")
+    mqtt_port = int(config.get("MQTT_PORT", 1883))
 
-        # Extract host and port
-        mqtt_host = config.get("MQTT_HOST", "localhost")
-        mqtt_port = int(config.get("MQTT_PORT", 1883))
+    # Prepare auth if credentials provided
+    auth = None
+    if config.get("MQTT_USERNAME") or config.get("MQTT_PASSWORD"):
+        auth = {
+            "username": config.get("MQTT_USERNAME", ""),
+            "password": config.get("MQTT_PASSWORD", "")
+        }
 
-        # Prepare auth if credentials provided
-        auth = None
-        if config.get("MQTT_USERNAME") or config.get("MQTT_PASSWORD"):
-            auth = {
-                "username": config.get("MQTT_USERNAME", ""),
-                "password": config.get("MQTT_PASSWORD", "")
-            }
-
-        publish.single(
-            topic=topic,
-            payload=json.dumps(payload),
-            hostname=mqtt_host,
-            port=mqtt_port,
-            auth=auth,
-            retain=True
-        )
-        return True
-    except Exception as e:
-
-        logger.error(f"Failed to publish to {topic}: {e}", exc_info=True)
-        return False
+    for attempt in range(retry_count):
+        try:
+            publish.single(
+                topic=topic,
+                payload=json.dumps(payload),
+                hostname=mqtt_host,
+                port=mqtt_port,
+                auth=auth,
+                retain=True,
+                keepalive=60,  # Increase keepalive
+                will=None,
+                tls=None,
+                protocol=publish.MQTTv311,  # Use specific MQTT version
+                transport="tcp"
+            )
+            return True
+        except Exception as e:
+            logger.warning(f"MQTT publish attempt {attempt + 1}/{retry_count} failed for {topic}: {e}")
+            if attempt < retry_count - 1:
+                time.sleep(1)  # Wait 1 second before retry
+            else:
+                logger.error(f"Failed to publish to {topic} after {retry_count} attempts: {e}")
+                return False
 
 def publish_mqtt_data(statistics, config):
     """Publish energy data to Home Assistant using timestamped topics for historical data."""
@@ -438,7 +446,9 @@ def publish_mqtt_data(statistics, config):
     # Calculate running totals for cumulative sum
     running_total = 0
     total_published = 0
-    for entry in statistics:
+    batch_size = 10  # Process in batches to avoid overwhelming MQTT
+    
+    for i, entry in enumerate(statistics):
         if not isinstance(entry, dict):
             logger.warning(f"Skipping invalid data point (not a dictionary): {entry}")
             continue
@@ -463,10 +473,19 @@ def publish_mqtt_data(statistics, config):
             }
             
             # Publish to timestamped topic
-            publish_mqtt_message(timestamped_topic, payload, config)
-            total_published += 1
+            if publish_mqtt_message(timestamped_topic, payload, config):
+                total_published += 1
+                logger.debug(f"Published 15-min interval: {entry['timestamp']} = {entry['value']} kWh to {timestamped_topic}")
+                
+                # Add small delay between messages to prevent overwhelming MQTT broker
+                time.sleep(0.1)  # 100ms delay between messages
+            else:
+                logger.warning(f"Failed to publish entry: {entry['start']}")
             
-            logger.debug(f"Published 15-min interval: {entry['timestamp']} = {entry['value']} kWh to {timestamped_topic}")
+            # Log progress every batch_size entries
+            if (i + 1) % batch_size == 0:
+                logger.info(f"Progress: {i + 1}/{len(statistics)} entries published to MQTT")
+                time.sleep(0.5)  # Longer pause between batches
             
         except Exception as e:
             logger.warning(f"Error publishing entry {entry}: {e}")
