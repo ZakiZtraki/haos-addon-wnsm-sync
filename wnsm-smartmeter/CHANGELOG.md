@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.21](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.20...v0.3.21) (2025-06-02)
+
+
+### Bug Fixes
+
+* **mqtt:** add robust template handling with default values for missing fields ([5ba876e](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/5ba876e8314041f2647d16a4d201a089b4775d88))
+
 ### [0.3.20](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.19...v0.3.20) (2025-06-02)
 
 ### [0.3.19](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v1.5.1...v0.3.19) (2025-06-01)
