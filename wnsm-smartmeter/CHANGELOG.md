@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.22](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.21...v0.3.22) (2025-06-02)
+
+
+### Bug Fixes
+
+* **mqtt:** changed the sensor configuration ([6e6061b](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/6e6061b43bee13679633fd109b826be183bc5db2))
+
 ### [0.3.21](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.20...v0.3.21) (2025-06-02)
 
 
