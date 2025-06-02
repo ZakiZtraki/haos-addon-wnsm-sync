@@ -10,10 +10,9 @@ import logging
 import time
 import yaml
 import re
-from datetime import datetime, timevalue, date
+from datetime import datetime, timedelta, date
 from decimal import Decimal
 import paho.mqtt.publish as publish
-import requests
 from pathlib import Path
 
 # Set log level based on DEBUG environment variable
@@ -514,8 +513,8 @@ def main():
         sys.exit(1)
     
     # Calculate date range based on configuration
-    end_date = date.today() - timevalue(days=1)  # Yesterday
-    start_date = end_date - timevalue(days=config["HISTORY_DAYS"] - 1)
+    end_date = date.today() - timedelta(days=1)  # Yesterday
+    start_date = end_date - timedelta(days=config["HISTORY_DAYS"] - 1)
     
     logger.info(f"Fetching data from {start_date} to {end_date}")
     
@@ -615,7 +614,7 @@ def fetch_bewegungsdaten(config):
         days = int(config.get("HISTORY_DAYS", 1))
         
         # Fetch data from API
-        from datetime import date, timevalue, datetime
+        from datetime import date, timedelta, datetime
         
         # Use yesterday as the end date since data is only available until the previous day
         date_until = date.today() - timevalue(days=1)
