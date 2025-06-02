@@ -10,7 +10,7 @@ import logging
 import time
 import yaml
 import re
-from datetime import datetime, timedelta, date
+from datetime import datetime, timevalue, date
 from decimal import Decimal
 import paho.mqtt.publish as publish
 import requests
@@ -245,7 +245,7 @@ def load_config():
         "STATISTIC_ID": "sensor.wiener_netze_energy",
         "MQTT_HOST": "core-mosquitto",
         "MQTT_PORT": 1883,
-        "MQTT_TOPIC": "smartmeter/energy/state",
+        "MQTT_TOPIC": "smartmeter/energy/#",
         "HISTORY_DAYS": 1,
         "RETRY_COUNT": 3,
         "RETRY_DELAY": 5,
@@ -354,7 +354,7 @@ def publish_mqtt_discovery(config):
             "unique_id": f"wnsm_sync_energy_sensor_{device_id}_v4",  # Force re-discovery
             "value_template": "{{ value_json.sum | default(value_json.value) | float }}",  # Use cumulative sum or fallback to value
             "json_attributes_topic": f"{config['MQTT_TOPIC']}/+",
-            "json_attributes_template": "{{ {'timestamp': value_json.timestamp | default(''), 'start': value_json.start | default(''), 'delta': value_json.delta | default(value_json.value) | default(0), 'interval_kwh': value_json.delta | default(value_json.value) | default(0)} | tojson }}",
+            "json_attributes_template": "{{ {'timestamp': value_json.timestamp | default(''), 'start': value_json.start | default(''), 'value': value_json.value | default(value_json.value) | default(0), 'interval_kwh': value_json.value | default(value_json.value) | default(0)} | tojson }}",
             "device": {
                 "identifiers": [f"wnsm_sync_{device_id}"],
                 "name": "Wiener Netze Smart Meter",  # This is the device name
@@ -373,7 +373,7 @@ def publish_mqtt_discovery(config):
             "unit_of_measurement": "kWh",
             "state_class": "measurement",  # No device class, so measurement is allowed
             "unique_id": f"wnsm_interval_sensor_{device_id}_v1",
-            "value_template": "{{ value_json.delta | default(value_json.value) | float }}",  # Individual 15-minute consumption
+            "value_template": "{{ value_json.value | default(value_json.value) | float }}",  # Individual 15-minute consumption
             "json_attributes_topic": f"{config['MQTT_TOPIC']}/+",
             "json_attributes_template": "{{ {'timestamp': value_json.timestamp | default(''), 'start': value_json.start | default(''), 'cumulative_sum': value_json.sum | default(value_json.value) | default(0)} | tojson }}",
             "device": {
@@ -444,23 +444,22 @@ def publish_mqtt_data(statistics, config):
             logger.warning(f"Skipping invalid data point (not a dictionary): {entry}")
             continue
             
-        if 'start' not in entry or 'delta' not in entry:
+        if 'start' not in entry or 'value' not in entry:
             logger.warning(f"Skipping data point with missing fields: {entry}")
             continue
         
         try:
             # Calculate running total
-            running_total += entry["delta"]
+            running_total += entry["value"]
             
             # Create unique topic for each timestamp to avoid overwriting
             timestamp_str = entry["start"].replace(":", "").replace("-", "").replace("T", "_").replace("Z", "")
-            timestamped_topic = f"{config['MQTT_TOPIC']}/{timestamp_str}"
+            timestamped_topic = f"{config['MQTT_TOPIC']}"
             
-            # Create the MQTT payload with the 15-minute delta value
+            # Create the MQTT payload with the 15-minute value value
             payload = {
-                "delta": entry["delta"],  # 15-minute consumption in kWh
-                "timestamp": entry["timestamp"],
-                "start": entry["start"],
+                "value": entry["value"],  # 15-minute consumption in kWh
+                "timestamp": entry["start"],
                 "sum": running_total  # Cumulative sum for total state class
             }
             
@@ -468,7 +467,7 @@ def publish_mqtt_data(statistics, config):
             publish_mqtt_message(timestamped_topic, payload, config)
             total_published += 1
             
-            logger.debug(f"Published 15-min interval: {entry['timestamp']} = {entry['delta']} kWh to {timestamped_topic}")
+            logger.debug(f"Published 15-min interval: {entry['timestamp']} = {entry['value']} kWh to {timestamped_topic}")
             
         except Exception as e:
             logger.warning(f"Error publishing entry {entry}: {e}")
@@ -478,7 +477,7 @@ def publish_mqtt_data(statistics, config):
     
     # Log summary statistics
     if statistics:
-        total_consumption = sum(s.get('delta', 0) for s in statistics)
+        total_consumption = sum(s.get('value', 0) for s in statistics)
         logger.info(f"Total consumption for period: {total_consumption:.3f} kWh across {len(statistics)} intervals")
 
 def main():
@@ -515,8 +514,8 @@ def main():
         sys.exit(1)
     
     # Calculate date range based on configuration
-    end_date = date.today() - timedelta(days=1)  # Yesterday
-    start_date = end_date - timedelta(days=config["HISTORY_DAYS"] - 1)
+    end_date = date.today() - timevalue(days=1)  # Yesterday
+    start_date = end_date - timevalue(days=config["HISTORY_DAYS"] - 1)
     
     logger.info(f"Fetching data from {start_date} to {end_date}")
     
@@ -534,7 +533,7 @@ def main():
         logger.error(f"Failed to fetch data: {e}")
         sys.exit(1)
     
-    # Process the data - create individual 15-minute delta values
+    # Process the data - create individual 15-minute value values
     statistics = []
     
     logger.info(f"Processing {len(bewegungsdaten.get('values', []))} data points")
@@ -542,12 +541,12 @@ def main():
     for entry in bewegungsdaten.get("values", []):
         try:
             ts = datetime.fromisoformat(entry["zeitpunktVon"].replace("Z", "+00:00"))
-            # Convert wert to float - this is the 15-minute consumption delta
+            # Convert wert to float - this is the 15-minute consumption value
             value_kwh = float(entry["wert"])
             
             statistics.append({
                 "start": ts.isoformat(),
-                "delta": value_kwh,  # This is the actual 15-minute consumption
+                "value": value_kwh,  # This is the actual 15-minute consumption
                 "timestamp": ts.isoformat()
             })
             logger.debug(f"Processed 15-min interval: {ts.isoformat()} = {value_kwh} kWh")
@@ -616,14 +615,14 @@ def fetch_bewegungsdaten(config):
         days = int(config.get("HISTORY_DAYS", 1))
         
         # Fetch data from API
-        from datetime import date, timedelta, datetime
+        from datetime import date, timevalue, datetime
         
         # Use yesterday as the end date since data is only available until the previous day
-        date_until = date.today() - timedelta(days=1)
+        date_until = date.today() - timevalue(days=1)
         logger.info(f"Using yesterday ({date_until}) as end date since data is only available until the previous day")
         
         # Calculate start date based on history_days
-        date_from = date_until - timedelta(days=days-1)  # -1 because we want to include the end date
+        date_from = date_until - timevalue(days=days-1)  # -1 because we want to include the end date
         
         logger.info(f"Fetching data from {date_from} to {date_until} ({days} days)")
         
@@ -779,7 +778,7 @@ def process_bewegungsdaten_response(raw_data, config=None):
         
     Returns:
         list: A list of dictionaries with standardized format for MQTT publishing
-              Each dictionary contains: start, delta, timestamp
+              Each dictionary contains: start, value, timestamp
     """
     # Default config if none provided
     if config is None:
@@ -801,7 +800,7 @@ def process_bewegungsdaten_response(raw_data, config=None):
                     if isinstance(point, dict) and 'timestamp' in point and 'value' in point:
                         processed_data.append({
                             "start": point['timestamp'],
-                            "delta": float(point['value']),  # Use delta for MQTT publishing
+                            "value": float(point['value']),  # Use value for MQTT publishing
                             "timestamp": point['timestamp']
                         })
             
@@ -834,7 +833,7 @@ def process_bewegungsdaten_response(raw_data, config=None):
                             value_float = float(value['value'])
                             processed_data.append({
                                 "start": value['timestamp'],
-                                "delta": value_float,  # Use delta for MQTT publishing
+                                "value": value_float,  # Use value for MQTT publishing
                                 "timestamp": value['timestamp']
                             })
                         # Format 2.2: Dictionary with 'wert', 'zeitpunktVon', and 'zeitpunktBis' keys (daily data)
@@ -848,7 +847,7 @@ def process_bewegungsdaten_response(raw_data, config=None):
                             logger.info(f"Processing daily data: {timestamp} to {value['zeitpunktBis']}, value: {value_float} kWh")
                             
                             # Create 96 15-minute entries to distribute the daily value (24 hours * 4 quarters = 96)
-                            from datetime import datetime, timedelta
+                            from datetime import datetime, timevalue
                             try:
                                 # Parse the timestamp
                                 dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
@@ -858,12 +857,12 @@ def process_bewegungsdaten_response(raw_data, config=None):
                                 
                                 # Create 96 15-minute entries
                                 for quarter in range(96):
-                                    quarter_dt = dt + timedelta(minutes=quarter * 15)
+                                    quarter_dt = dt + timevalue(minutes=quarter * 15)
                                     quarter_timestamp = quarter_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
                                     
                                     processed_data.append({
                                         "start": quarter_timestamp,
-                                        "delta": quarter_hour_value,  # Use delta for MQTT publishing
+                                        "value": quarter_hour_value,  # Use value for MQTT publishing
                                         "timestamp": quarter_timestamp
                                     })
                                 
@@ -873,7 +872,7 @@ def process_bewegungsdaten_response(raw_data, config=None):
                                 # If we can't create 15-minute entries, just use the daily value
                                 processed_data.append({
                                     "start": timestamp,
-                                    "delta": value_float,  # Use delta for MQTT publishing
+                                    "value": value_float,  # Use value for MQTT publishing
                                     "timestamp": timestamp
                                 })
                         else:
@@ -911,7 +910,7 @@ def process_bewegungsdaten_response(raw_data, config=None):
                                 if timestamp and value_num is not None:
                                     processed_data.append({
                                         "start": timestamp,
-                                        "delta": value_num,  # Use delta for MQTT publishing
+                                        "value": value_num,  # Use value for MQTT publishing
                                         "timestamp": timestamp
                                     })
         
@@ -943,7 +942,7 @@ def process_bewegungsdaten_response(raw_data, config=None):
                     if timestamp and value_num is not None:
                         processed_data.append({
                             "start": timestamp,
-                            "delta": value_num,  # Use delta for MQTT publishing
+                            "value": value_num,  # Use value for MQTT publishing
                             "timestamp": timestamp
                         })
         
@@ -962,10 +961,10 @@ def process_bewegungsdaten_response(raw_data, config=None):
             # If USE_MOCK_DATA is enabled in config, generate mock data
             if config.get("USE_MOCK_DATA", False):
                 logger.info("USE_MOCK_DATA is enabled, generating mock data as fallback")
-                from datetime import date, timedelta
+                from datetime import date, timevalue
                 today = date.today()
-                yesterday = today - timedelta(days=1)
-                return _generate_mock_data(yesterday - timedelta(days=6), yesterday)
+                yesterday = today - timevalue(days=1)
+                return _generate_mock_data(yesterday - timevalue(days=6), yesterday)
         
         return processed_data
     
@@ -976,7 +975,7 @@ def process_bewegungsdaten_response(raw_data, config=None):
 
 def _generate_mock_data(date_from, date_until):
     """Generate mock data for testing purposes."""
-    from datetime import datetime, timedelta
+    from datetime import datetime, timevalue
     
     # Create a simple mock response with some data
     mock_data = []
@@ -992,12 +991,12 @@ def _generate_mock_data(date_from, date_until):
         
         mock_data.append({
             "start": current_date.strftime("%Y-%m-%dT%H:%M:%S.000Z"),
-            "delta": value,  # Use delta for MQTT publishing
+            "value": value,  # Use value for MQTT publishing
             "timestamp": current_date.strftime("%Y-%m-%dT%H:%M:%S.000Z")
         })
         
         # Increment by 15 minutes
-        current_date += timedelta(minutes=15)
+        current_date += timevalue(minutes=15)
     
     logger.info(f"Generated {len(mock_data)} mock data points")
     return mock_data
