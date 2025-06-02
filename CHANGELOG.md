@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.26](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.25...v0.3.26) (2025-06-02)
+
+
+### Bug Fixes
+
+* **mqtt): fix(mqtt:** import MQTT client for improved message publishing ([c43f41a](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/c43f41a11e7aa2cc570280b3d5deeba40151e969))
+
 ### [0.3.25](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.24...v0.3.25) (2025-06-02)
 
 
