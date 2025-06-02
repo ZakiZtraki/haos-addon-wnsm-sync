@@ -617,11 +617,11 @@ def fetch_bewegungsdaten(config):
         from datetime import date, timedelta, datetime
         
         # Use yesterday as the end date since data is only available until the previous day
-        date_until = date.today() - timevalue(days=1)
+        date_until = date.today() - timedelta(days=1)
         logger.info(f"Using yesterday ({date_until}) as end date since data is only available until the previous day")
         
         # Calculate start date based on history_days
-        date_from = date_until - timevalue(days=days-1)  # -1 because we want to include the end date
+        date_from = date_until - timedelta(days=days-1)  # -1 because we want to include the end date
         
         logger.info(f"Fetching data from {date_from} to {date_until} ({days} days)")
         
@@ -846,7 +846,7 @@ def process_bewegungsdaten_response(raw_data, config=None):
                             logger.info(f"Processing daily data: {timestamp} to {value['zeitpunktBis']}, value: {value_float} kWh")
                             
                             # Create 96 15-minute entries to distribute the daily value (24 hours * 4 quarters = 96)
-                            from datetime import datetime, timevalue
+                            from datetime import datetime, timedelta
                             try:
                                 # Parse the timestamp
                                 dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
@@ -856,7 +856,7 @@ def process_bewegungsdaten_response(raw_data, config=None):
                                 
                                 # Create 96 15-minute entries
                                 for quarter in range(96):
-                                    quarter_dt = dt + timevalue(minutes=quarter * 15)
+                                    quarter_dt = dt + timedelta(minutes=quarter * 15)
                                     quarter_timestamp = quarter_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
                                     
                                     processed_data.append({
@@ -960,10 +960,10 @@ def process_bewegungsdaten_response(raw_data, config=None):
             # If USE_MOCK_DATA is enabled in config, generate mock data
             if config.get("USE_MOCK_DATA", False):
                 logger.info("USE_MOCK_DATA is enabled, generating mock data as fallback")
-                from datetime import date, timevalue
+                from datetime import date, timedelta
                 today = date.today()
-                yesterday = today - timevalue(days=1)
-                return _generate_mock_data(yesterday - timevalue(days=6), yesterday)
+                yesterday = today - timedelta(days=1)
+                return _generate_mock_data(yesterday - timedelta(days=6), yesterday)
         
         return processed_data
     
@@ -974,7 +974,7 @@ def process_bewegungsdaten_response(raw_data, config=None):
 
 def _generate_mock_data(date_from, date_until):
     """Generate mock data for testing purposes."""
-    from datetime import datetime, timevalue
+    from datetime import datetime, timedelta
     
     # Create a simple mock response with some data
     mock_data = []
@@ -995,7 +995,7 @@ def _generate_mock_data(date_from, date_until):
         })
         
         # Increment by 15 minutes
-        current_date += timevalue(minutes=15)
+        current_date += timedelta(minutes=15)
     
     logger.info(f"Generated {len(mock_data)} mock data points")
     return mock_data
