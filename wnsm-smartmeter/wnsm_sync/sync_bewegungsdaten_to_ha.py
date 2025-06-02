@@ -392,6 +392,7 @@ def publish_mqtt_discovery(config):
 def publish_mqtt_message(topic, payload, config, retry_count=3):
     """Publish a message to MQTT with appropriate configuration and retry logic."""
     import paho.mqtt.publish as publish
+    import paho.mqtt.client as mqtt
     
     # Extract host and port
     mqtt_host = config.get("MQTT_HOST", "localhost")
@@ -417,7 +418,7 @@ def publish_mqtt_message(topic, payload, config, retry_count=3):
                 keepalive=60,  # Increase keepalive
                 will=None,
                 tls=None,
-                protocol=publish.MQTTv311,  # Use specific MQTT version
+                protocol=mqtt.MQTTv311,  # Use specific MQTT version from client module
                 transport="tcp"
             )
             return True
