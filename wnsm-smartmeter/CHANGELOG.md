@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.23](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.22...v0.3.23) (2025-06-02)
+
+
+### Bug Fixes
+
+* **datetime:** replace timevalue with timedelta for date calculations ([422d8de](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/422d8de2ac0ec37b9630f15783fd4d5cc2206b09))
+
 ### [0.3.22](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.21...v0.3.22) (2025-06-02)
 
 
