@@ -1,0 +1,29 @@
+name: Automated Pull Request
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Your build or update steps go here
+      # For example, updating version numbers, changelogs, etc.
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: automated updates"
+          title: "Automated Updates"
+          body: |
+            This pull request contains automated updates.
+          branch: automated-updates
+          delete-branch: true
+          base: main
