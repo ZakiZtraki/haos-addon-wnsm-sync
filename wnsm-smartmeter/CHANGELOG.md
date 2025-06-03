@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.27](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.26...v0.3.27) (2025-06-03)
+
+
+### Bug Fixes
+
+* **dockerfile:** corrected typo in dockerfile ([c991b40](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/c991b4030b522cf019c978d9d4212a4126719bfc))
+
 ### [0.3.26](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.25...v0.3.26) (2025-06-02)
 
 
