@@ -30,7 +30,7 @@ RUN apk del gcc musl-dev python3-dev libffi-dev openssl-dev
 
 # Copy application code
 COPY src/ ./src/
-COPY run_new.py ./run.py
+COPY run.py ./run.py
 
 # Create directory structure for rootfs
 RUN mkdir -p /etc/services.d/wnsm/
