@@ -1,0 +1,1 @@
+"""Test fixtures for WNSM Sync."""

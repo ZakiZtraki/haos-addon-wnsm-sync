@@ -29,8 +29,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN apk del gcc musl-dev python3-dev libffi-dev openssl-dev
 
 # Copy application code
-COPY wnsm_sync/ ./wnsm_sync/
-COPY run.py ./
+COPY src/ ./src/
+COPY run_new.py ./run.py
 
 # Create directory structure for rootfs
 RUN mkdir -p /etc/services.d/wnsm/
