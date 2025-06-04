@@ -69,7 +69,8 @@ class MQTTClient:
         self, 
         topic: str, 
         payload: Dict[str, Any], 
-        retry_count: Optional[int] = None
+        retry_count: Optional[int] = None,
+        retain: bool = False
     ) -> bool:
         """Publish a message to MQTT broker.
         
@@ -77,6 +78,7 @@ class MQTTClient:
             topic: MQTT topic to publish to
             payload: Message payload (will be JSON serialized)
             retry_count: Number of retry attempts (uses config default if None)
+            retain: Whether to retain the message on the broker
             
         Returns:
             True if message was published successfully, False otherwise
@@ -96,7 +98,7 @@ class MQTTClient:
                     hostname=self._hostname,
                     port=self._port,
                     auth=self._auth,
-                    retain=False
+                    retain=retain
                 )
                 
                 logger.debug(f"Successfully published to {topic}")

@@ -212,7 +212,7 @@ class WNSMSync:
             "error": error
         }
         
-        return self.mqtt_client.publish_message(topic, payload)
+        return self.mqtt_client.publish_message(topic, payload, retain=True)
     
     def publish_availability(self, available: bool = True) -> bool:
         """Publish availability status to MQTT.

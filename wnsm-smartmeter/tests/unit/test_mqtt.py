@@ -100,6 +100,44 @@ def test_mqtt_publish_message(mock_publish):
     print("✅ MQTT message publishing works correctly")
 
 
+@patch('paho.mqtt.publish.single')
+def test_mqtt_publish_message_with_retention(mock_publish):
+    """Test MQTT message publishing with retention."""
+    
+    config = WNSMConfig(
+        wnsm_username="test",
+        wnsm_password="test",
+        zp="AT0010000000000000001000004392265",
+        mqtt_host="localhost"
+    )
+    
+    client = MQTTClient(config)
+    
+    # Test publishing with retention
+    test_payload = {"status": "online", "timestamp": "2025-01-15T10:00:00Z"}
+    result = client.publish_message("test/topic", test_payload, retain=True)
+    
+    assert result is True
+    mock_publish.assert_called_once()
+    
+    # Check that retain=True was passed
+    call_args = mock_publish.call_args
+    assert call_args[1]['retain'] is True
+    
+    # Test publishing without retention (default)
+    mock_publish.reset_mock()
+    result = client.publish_message("test/topic", test_payload)
+    
+    assert result is True
+    mock_publish.assert_called_once()
+    
+    # Check that retain=False is the default
+    call_args = mock_publish.call_args
+    assert call_args[1]['retain'] is False
+    
+    print("✅ MQTT message retention works correctly")
+
+
 def test_home_assistant_discovery():
     """Test Home Assistant discovery configuration."""
     
