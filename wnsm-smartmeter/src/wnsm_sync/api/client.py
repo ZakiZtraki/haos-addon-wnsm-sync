@@ -1239,8 +1239,6 @@ class Smartmeter:
                 
                 logger.info(f"Converted {len(converted_data['data'])} data points to expected format")
                 return converted_data
-            
-            return data
             else:
                 logger.warning(f"Unexpected data format from vienna-smartmeter: {type(data)}")
                 return self._get_mock_bewegungsdaten(zaehlpunktnummer, date_from, date_until, valuetype)
