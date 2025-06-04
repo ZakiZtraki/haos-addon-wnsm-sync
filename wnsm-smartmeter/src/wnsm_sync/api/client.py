@@ -1206,11 +1206,12 @@ class Smartmeter:
             customer_id, zaehlpunkt, anlagetype = self.get_zaehlpunkt(zaehlpunktnummer)
             logger.info(f"Using zaehlpunkt: {zaehlpunkt}, customer_id: {customer_id}, anlagetype: {anlagetype}")
             
-            # Use the vienna-smartmeter library
+            # Use the vienna-smartmeter library with 15-minute resolution
             data = self._client.bewegungsdaten(
                 zaehlpunkt=zaehlpunkt,
                 date_from=date_from,
-                date_to=date_until  # vienna-smartmeter uses 'date_to' not 'date_until'
+                date_to=date_until,  # vienna-smartmeter uses 'date_to' not 'date_until'
+                rolle="V001"  # V001 = 15-minute intervals, V002 = daily averages
             )
             
             logger.info(f"Vienna smartmeter returned bewegungsdaten: {type(data)}")
@@ -1256,19 +1257,23 @@ class Smartmeter:
         mock_data = []
         current_date = date_from
         while current_date <= date_until:
-            # Generate 4 data points per day (every 6 hours) for simplicity
-            for hour in [0, 6, 12, 18]:
-                timestamp = current_date.strftime("%Y-%m-%d") + f"T{hour:02d}:00:00.000Z"
-                mock_data.append({
-                    "timestamp": timestamp,
-                    "value": 2.5  # Mock consumption in kWh
-                })
+            # Generate 15-minute intervals (96 data points per day)
+            for hour in range(24):
+                for minute in [0, 15, 30, 45]:
+                    timestamp = current_date.strftime("%Y-%m-%d") + f"T{hour:02d}:{minute:02d}:00.000Z"
+                    # Vary the consumption slightly to make it more realistic
+                    base_consumption = 0.25  # Base 15-minute consumption in kWh
+                    variation = (hour % 12) * 0.02  # Slight variation based on time of day
+                    mock_data.append({
+                        "timestamp": timestamp,
+                        "value": round(base_consumption + variation, 3)
+                    })
             current_date += timedelta(days=1)
         
         return {
             "descriptor": {
                 "zaehlpunktnummer": zaehlpunktnummer or "mock_zaehlpunkt",
-                "rolle": "V002",
+                "rolle": "V001",  # V001 = 15-minute intervals
                 "zeitpunktVon": date_from.strftime("%Y-%m-%dT00:00:00.000Z"),
                 "zeitpunktBis": date_until.strftime("%Y-%m-%dT23:59:59.999Z")
             },
