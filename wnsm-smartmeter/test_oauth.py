@@ -44,8 +44,19 @@ def test_oauth_authentication(username: str, password: str):
         client.login()
         print("✅ Login successful!")
         
-        # Test zaehlpunkte
-        print("\n📊 Testing zaehlpunkte...")
+        # Test raw zaehlpunkte from vienna-smartmeter
+        print("\n📊 Testing raw zaehlpunkte from vienna-smartmeter...")
+        raw_zaehlpunkte = client._client.zaehlpunkte()
+        print(f"✅ Raw data type: {type(raw_zaehlpunkte)}")
+        print(f"✅ Raw data length: {len(raw_zaehlpunkte) if isinstance(raw_zaehlpunkte, list) else 'N/A'}")
+        
+        if isinstance(raw_zaehlpunkte, list) and len(raw_zaehlpunkte) > 0:
+            print(f"✅ First raw item: {raw_zaehlpunkte[0]}")
+            if isinstance(raw_zaehlpunkte[0], dict):
+                print(f"✅ First raw item keys: {list(raw_zaehlpunkte[0].keys())}")
+        
+        # Test processed zaehlpunkte
+        print("\n📊 Testing processed zaehlpunkte...")
         zaehlpunkte = client.zaehlpunkte()
         print(f"✅ Found {len(zaehlpunkte)} contracts")
         
@@ -60,6 +71,9 @@ def test_oauth_authentication(username: str, password: str):
         if zaehlpunkte and zaehlpunkte[0].get('zaehlpunkte'):
             first_zp = zaehlpunkte[0]['zaehlpunkte'][0]['zaehlpunktnummer']
             print(f"\n📈 Testing bewegungsdaten for {first_zp}...")
+        else:
+            print("\n❌ No zaehlpunkte found for bewegungsdaten test")
+            return False
             
             # Get data for the last 7 days
             date_until = date.today()

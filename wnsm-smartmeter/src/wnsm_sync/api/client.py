@@ -879,25 +879,34 @@ class Smartmeter:
             data = self._client.zaehlpunkte()
             logger.info(f"Vienna smartmeter returned: {type(data)} with {len(data) if isinstance(data, list) else 'unknown'} items")
             
+            # Debug: log the actual data structure
+            if isinstance(data, list) and len(data) > 0:
+                logger.info(f"First item structure: {data[0]}")
+                logger.info(f"First item keys: {list(data[0].keys()) if isinstance(data[0], dict) else 'N/A'}")
+            
             # Convert to the format expected by the rest of the code
             if isinstance(data, list):
                 contracts = []
                 for item in data:
+                    # The vienna-smartmeter library returns the correct structure already
                     contract = {
-                        "geschaeftspartner": item.get("customerId", "unknown"),
+                        "geschaeftspartner": item.get("geschaeftspartner", "unknown"),
                         "zaehlpunkte": []
                     }
                     
-                    # Add zaehlpunkt data
-                    zp_data = {
-                        "zaehlpunktnummer": item.get("zaehlpunktnummer", ""),
-                        "anlage": {
-                            "typ": item.get("anlagentyp", "TAGSTROM")
+                    # Process the zaehlpunkte array from the vienna-smartmeter response
+                    for zp in item.get("zaehlpunkte", []):
+                        zp_data = {
+                            "zaehlpunktnummer": zp.get("zaehlpunktnummer", ""),
+                            "anlage": {
+                                "typ": zp.get("anlage", {}).get("typ", "TAGSTROM")
+                            }
                         }
-                    }
-                    contract["zaehlpunkte"].append(zp_data)
+                        contract["zaehlpunkte"].append(zp_data)
+                    
                     contracts.append(contract)
                 
+                logger.info(f"Converted {len(contracts)} contracts with {sum(len(c['zaehlpunkte']) for c in contracts)} zaehlpunkte")
                 return contracts
             else:
                 logger.warning(f"Unexpected data format from vienna-smartmeter: {type(data)}")
@@ -1201,10 +1210,16 @@ class Smartmeter:
             data = self._client.bewegungsdaten(
                 zaehlpunkt=zaehlpunkt,
                 date_from=date_from,
-                date_until=date_until
+                date_to=date_until  # vienna-smartmeter uses 'date_to' not 'date_until'
             )
             
             logger.info(f"Vienna smartmeter returned bewegungsdaten: {type(data)}")
+            logger.info(f"Bewegungsdaten keys: {list(data.keys()) if isinstance(data, dict) else 'N/A'}")
+            if isinstance(data, dict):
+                data_array = data.get('data', [])
+                logger.info(f"Data array length: {len(data_array)}")
+                if len(data_array) > 0:
+                    logger.info(f"First data point: {data_array[0]}")
             
             # Convert to expected format
             if isinstance(data, dict):
