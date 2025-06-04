@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.35](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.34...v0.3.35) (2025-06-04)
+
+
+### Bug Fixes
+
+* **api:** remove redundant return statement in data conversion ([f4d7893](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/f4d78935d2c9429c05413e03382de8b6e1883b43))
+
 ### [0.3.34](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.33...v0.3.34) (2025-06-04)
 
 
