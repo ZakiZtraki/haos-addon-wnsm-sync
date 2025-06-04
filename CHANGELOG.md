@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.28](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.27...v0.3.28) (2025-06-04)
+
+
+### Bug Fixes
+
+* **perameter call:** the parameter call zaehlpunkt has been corrected ([e9a061f](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/e9a061fbb2d4dd3149ec314510493640850a0681))
+
 ### [0.3.27](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.26...v0.3.27) (2025-06-03)
 
 
