@@ -1207,12 +1207,17 @@ class Smartmeter:
             logger.info(f"Using zaehlpunkt: {zaehlpunkt}, customer_id: {customer_id}, anlagetype: {anlagetype}")
             
             # Use the vienna-smartmeter library with 15-minute resolution
+            logger.info(f"Requesting bewegungsdaten with rolle=V002 (15-min intervals)")
+            logger.info(f"Date range: {date_from} to {date_until}")
+            
+            # Use V002 for 15-minute intervals (discovered through testing)
             data = self._client.bewegungsdaten(
                 zaehlpunkt=zaehlpunkt,
                 date_from=date_from,
-                date_to=date_until,  # vienna-smartmeter uses 'date_to' not 'date_until'
-                rolle="V001"  # V001 = 15-minute intervals, V002 = daily averages
+                date_to=date_until,
+                rolle="V002"  # V002 gives 15-minute intervals for this meter type
             )
+            logger.info(f"Got data with rolle=V002: {len(data.get('values', []))} points")
             
             logger.info(f"Vienna smartmeter returned bewegungsdaten: {type(data)}")
             logger.info(f"Bewegungsdaten keys: {list(data.keys()) if isinstance(data, dict) else 'N/A'}")
