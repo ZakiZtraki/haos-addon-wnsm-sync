@@ -91,8 +91,10 @@ def test_oauth_authentication(username: str, password: str):
             if data_points > 0:
                 first_point = bewegungsdaten['data'][0]
                 last_point = bewegungsdaten['data'][-1]
-                print(f"   First: {first_point.get('timestamp')} = {first_point.get('value')} kWh")
-                print(f"   Last:  {last_point.get('timestamp')} = {last_point.get('value')} kWh")
+                print(f"   First: {first_point.get('timestamp')} = {first_point.get('value')} kWh (estimated: {first_point.get('estimated')})")
+                print(f"   Last:  {last_point.get('timestamp')} = {last_point.get('value')} kWh (estimated: {last_point.get('estimated')})")
+            else:
+                print("   No data points found - this might be normal for recent dates")
         
         print("\n🎉 All tests passed! OAuth authentication is working correctly.")
         return True

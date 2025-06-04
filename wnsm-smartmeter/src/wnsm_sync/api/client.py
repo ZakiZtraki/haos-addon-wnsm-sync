@@ -1216,14 +1216,31 @@ class Smartmeter:
             logger.info(f"Vienna smartmeter returned bewegungsdaten: {type(data)}")
             logger.info(f"Bewegungsdaten keys: {list(data.keys()) if isinstance(data, dict) else 'N/A'}")
             if isinstance(data, dict):
-                data_array = data.get('data', [])
-                logger.info(f"Data array length: {len(data_array)}")
-                if len(data_array) > 0:
-                    logger.info(f"First data point: {data_array[0]}")
+                values_array = data.get('values', [])
+                logger.info(f"Values array length: {len(values_array)}")
+                if len(values_array) > 0:
+                    logger.info(f"First data point: {values_array[0]}")
             
-            # Convert to expected format
-            if isinstance(data, dict):
-                return data
+            # Convert vienna-smartmeter format to expected format
+            if isinstance(data, dict) and 'values' in data:
+                # Convert from vienna-smartmeter format to our expected format
+                converted_data = {
+                    'data': []
+                }
+                
+                for item in data.get('values', []):
+                    # Convert the data point format
+                    converted_item = {
+                        'timestamp': item.get('zeitpunktVon', ''),  # Use zeitpunktVon as timestamp
+                        'value': item.get('wert', 0),
+                        'estimated': item.get('geschaetzt', False)
+                    }
+                    converted_data['data'].append(converted_item)
+                
+                logger.info(f"Converted {len(converted_data['data'])} data points to expected format")
+                return converted_data
+            
+            return data
             else:
                 logger.warning(f"Unexpected data format from vienna-smartmeter: {type(data)}")
                 return self._get_mock_bewegungsdaten(zaehlpunktnummer, date_from, date_until, valuetype)
