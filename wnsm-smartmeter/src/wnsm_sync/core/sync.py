@@ -40,7 +40,8 @@ class WNSMSync:
                 username=self.config.wnsm_username,
                 password=self.config.wnsm_password,
                 use_mock=self.config.use_mock_data,
-                api_timeout=self.config.api_timeout
+                api_timeout=self.config.api_timeout,
+                use_oauth=getattr(self.config, 'use_oauth', True)
             )
             # Try to load existing session
             self.session_manager.load_session(self._api_client)

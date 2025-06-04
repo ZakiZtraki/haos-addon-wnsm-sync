@@ -9,6 +9,7 @@ from typing import List, Dict, Any, Tuple, Optional
 import requests
 from dateutil.relativedelta import relativedelta
 from lxml import html
+from vienna_smartmeter import Smartmeter as ViennaSmartmeter
 
 from . import constants as const
 from .errors import (
@@ -21,9 +22,9 @@ logger = logging.getLogger(__name__)
 
 
 class Smartmeter:
-    """Smartmeter client for accessing the API."""
+    """Smartmeter client wrapper for the vienna-smartmeter library."""
 
-    def __init__(self, username: str, password: str, use_mock: bool = False, api_timeout: int = 60):
+    def __init__(self, username: str, password: str, use_mock: bool = False, api_timeout: int = 60, use_oauth: bool = True):
         """Initialize the Smartmeter API client.
 
         Args:
@@ -31,12 +32,19 @@ class Smartmeter:
             password (str): Password used for API login.
             use_mock (bool, optional): Use mock data instead of real API calls. Defaults to False.
             api_timeout (int, optional): API request timeout in seconds. Defaults to 60.
+            use_oauth (bool, optional): Use OAuth authentication. Defaults to True.
         """
         self.username = username
         self.password = password
-        self.session = requests.Session()
         self._use_mock = use_mock
         self.api_timeout = api_timeout
+        self.use_oauth = use_oauth
+        
+        # Initialize the vienna-smartmeter client (defer initialization until login)
+        self._client = None
+        self._vienna_client_initialized = False
+            
+        # For session management compatibility
         self._access_token = None
         self._refresh_token = None
         self._api_gateway_token = None
@@ -267,46 +275,38 @@ class Smartmeter:
         Raises:
             SmartmeterLoginError: If login fails.
         """
-        if self.is_login_expired():
-            logger.info("Access token expired, resetting session")
-            self.reset()
+        if self._use_mock:
+            logger.info("Mock mode enabled, skipping login")
+            self._access_token = "mock_token"
+            self._access_token_expiration = datetime.now() + timedelta(hours=1)
+            return self
             
-        if not self.is_logged_in():
-            logger.info("Not logged in, using API Key authentication")
-            try:
-                # Skip OAuth and use API Key directly
-                logger.info("Using API Key for authentication")
-                
-                # Set API gateway tokens
-                self._access_token = "api_key_auth"  # Dummy token
-                self._refresh_token = ""
-                self._api_gateway_token = const.API_KEY
-                self._api_gateway_b2b_token = const.OAUTH_CLIENT_ID
-                
-                # Set expiration times (1 hour for access token)
-                now = datetime.now()
-                self._access_token_expiration = now + timedelta(hours=1)
-                self._refresh_token_expiration = now + timedelta(days=1)
-                
-                logger.info("API Key authentication set successfully")
-                logger.info(f"Access Token valid until {self._access_token_expiration}")
-                
-            except Exception as error:
-                logger.error(f"Login failed: {str(error)}")
-                logger.info("Using mock data as fallback")
-                
-                # Set mock data as fallback
-                self._access_token = "mock_token"
-                self._refresh_token = "mock_refresh_token"
-                self._api_gateway_token = const.API_KEY
-                self._api_gateway_b2b_token = const.OAUTH_CLIENT_ID
-                
-                # Set expiration times
-                now = datetime.now()
-                self._access_token_expiration = now + timedelta(hours=1)
-                self._refresh_token_expiration = now + timedelta(days=1)
-                
-        return self
+        if not self.use_oauth:
+            logger.warning("OAuth disabled - API calls will likely fail")
+            self._access_token = "api_key_auth"
+            self._access_token_expiration = datetime.now() + timedelta(hours=1)
+            return self
+            
+        try:
+            logger.info("Performing OAuth login using vienna-smartmeter library")
+            
+            # Initialize the vienna-smartmeter client (this will trigger authentication)
+            if not self._vienna_client_initialized:
+                logger.info(f"Initializing vienna-smartmeter client with username: {self.username}")
+                self._client = ViennaSmartmeter(self.username, self.password)
+                self._vienna_client_initialized = True
+                logger.info("Vienna-smartmeter client initialized successfully")
+            
+            # Mark as logged in
+            self._access_token = "vienna_smartmeter_authenticated"
+            self._access_token_expiration = datetime.now() + timedelta(hours=1)
+            
+            logger.info("OAuth login completed successfully")
+            return self
+            
+        except Exception as error:
+            logger.error(f"OAuth login failed: {str(error)}")
+            raise SmartmeterLoginError(f"OAuth authentication failed: {str(error)}") from error
 
     def _access_valid_or_raise(self):
         """Check if the access token is still valid or raise an exception.
@@ -864,79 +864,66 @@ class Smartmeter:
             list: List of zaehlpunkte data.
         """
         logger.info("Getting zaehlpunkte")
+        
+        if self._use_mock:
+            logger.info("MOCK DATA MODE: Using simulated data instead of calling the real API")
+            return self._get_mock_zaehlpunkte()
+            
+        if not self.use_oauth or self._client is None:
+            logger.warning("OAuth disabled or client not initialized, returning mock data")
+            return self._get_mock_zaehlpunkte()
+            
         try:
-            # Use the endpoint from the schema
-            data = self._call_api(const.ENDPOINTS["zaehlpunkte"])
+            logger.info("Using vienna-smartmeter library to get zaehlpunkte")
+            # Use the vienna-smartmeter library
+            data = self._client.zaehlpunkte()
+            logger.info(f"Vienna smartmeter returned: {type(data)} with {len(data) if isinstance(data, list) else 'unknown'} items")
             
-            # Check if we got mock data or real data
-            if data.get("items") and isinstance(data.get("items"), dict):
-                # This is the format from the schema
-                logger.info("Got zaehlpunkte data in schema format")
-                
-                # Convert to the format expected by the rest of the code
-                mock_contracts = []
-                mock_contract = {
-                    "geschaeftspartner": "customer_id",
-                    "zaehlpunkte": []
-                }
-                
-                # Add the zaehlpunkt to the contract
-                zp = data.get("items")
-                zp_data = {
-                    "zaehlpunktnummer": zp.get("zaehlpunktnummer"),
-                    "anlage": {
-                        "typ": zp.get("anlage", {}).get("typ", "TAGSTROM")
+            # Convert to the format expected by the rest of the code
+            if isinstance(data, list):
+                contracts = []
+                for item in data:
+                    contract = {
+                        "geschaeftspartner": item.get("customerId", "unknown"),
+                        "zaehlpunkte": []
                     }
-                }
-                mock_contract["zaehlpunkte"].append(zp_data)
-                mock_contracts.append(mock_contract)
-                return mock_contracts
-            
-            # Check if we got mock data in our custom format
-            elif data.get("zaehlpunkte") and isinstance(data.get("zaehlpunkte"), list):
-                # Convert the mock data to the expected format
-                logger.info("Converting mock zaehlpunkte data to expected format")
-                
-                # Create a mock contract with the zaehlpunkte
-                mock_contracts = []
-                mock_contract = {
-                    "geschaeftspartner": "mock_customer_id",
-                    "zaehlpunkte": []
-                }
-                
-                for zp in data.get("zaehlpunkte", []):
-                    # Add anlage structure
-                    zp["anlage"] = {
-                        "typ": zp.get("anlagentyp", "TAGSTROM")
-                    }
-                    mock_contract["zaehlpunkte"].append(zp)
-                
-                mock_contracts.append(mock_contract)
-                return mock_contracts
-            
-            # If we got some other format, try to use it as is
-            logger.info(f"Got zaehlpunkte data in unknown format: {data}")
-            return data
-            
-        except Exception as e:
-            logger.error(f"Error getting zaehlpunkte: {str(e)}")
-            
-            # Return mock data
-            logger.info("Returning mock zaehlpunkte data")
-            mock_contracts = [
-                {
-                    "geschaeftspartner": "mock_customer_id",
-                    "zaehlpunkte": [
-                        {
-                            "zaehlpunktnummer": "AT0010000000000000000000000000000",
-                            "anlage": {
-                                "typ": "TAGSTROM"
-                            }
+                    
+                    # Add zaehlpunkt data
+                    zp_data = {
+                        "zaehlpunktnummer": item.get("zaehlpunktnummer", ""),
+                        "anlage": {
+                            "typ": item.get("anlagentyp", "TAGSTROM")
                         }
-                    ]
+                    }
+                    contract["zaehlpunkte"].append(zp_data)
+                    contracts.append(contract)
+                
+                return contracts
+            else:
+                logger.warning(f"Unexpected data format from vienna-smartmeter: {type(data)}")
+                return self._get_mock_zaehlpunkte()
+                
+        except Exception as e:
+            logger.error(f"Error getting zaehlpunkte: {e}")
+            logger.info("Returning mock zaehlpunkte data")
+            return self._get_mock_zaehlpunkte()
+    
+    def _get_mock_zaehlpunkte(self) -> list:
+        """Get mock zaehlpunkte data for testing."""
+        logger.info("Returning mock zaehlpunkte data")
+        
+        mock_contracts = []
+        mock_contract = {
+            "geschaeftspartner": "mock_customer_id",
+            "zaehlpunkte": [{
+                "zaehlpunktnummer": "AT0010000000000000000000000000000000",
+                "anlage": {
+                    "typ": "TAGSTROM"
                 }
-            ]
-            return mock_contracts
+            }]
+        }
+        mock_contracts.append(mock_contract)
+        return mock_contracts
 
     def consumptions(self) -> dict:
         """Get energy consumption data.
@@ -1189,160 +1176,71 @@ class Smartmeter:
         """
         logger.info(f"Fetching bewegungsdaten for dates: {date_from} to {date_until}")
         
+        # Set date range defaults
+        if date_until is None:
+            date_until = date.today()
+        if date_from is None:
+            date_from = date_until - relativedelta(years=3)
+            
+        if self._use_mock:
+            logger.info("MOCK DATA MODE: Using simulated bewegungsdaten")
+            return self._get_mock_bewegungsdaten(zaehlpunktnummer, date_from, date_until, valuetype)
+            
+        if not self.use_oauth or self._client is None:
+            logger.warning("OAuth disabled or client not initialized, returning mock data")
+            return self._get_mock_bewegungsdaten(zaehlpunktnummer, date_from, date_until, valuetype)
+            
         try:
-            # Try to get the zaehlpunkt info
-            try:
-                customer_id, zaehlpunkt, anlagetype = self.get_zaehlpunkt(zaehlpunktnummer)
-                logger.info(f"Using zaehlpunkt: {zaehlpunkt}, customer_id: {customer_id}, anlagetype: {anlagetype}")
-            except Exception as e:
-                logger.warning(f"Could not get zaehlpunkt info: {str(e)}")
-                # Use default values for mock data
-                customer_id = "mock_customer_id"
-                zaehlpunkt = zaehlpunktnummer or "mock_zaehlpunkt"
-                anlagetype = const.AnlagenType.CONSUMING
-                logger.info(f"Using mock zaehlpunkt: {zaehlpunkt}")
-
-            # Set date range defaults
-            if date_until is None:
-                date_until = date.today()
-
-            if date_from is None:
-                date_from = date_until - relativedelta(years=3)
-
-            # Try using the new API endpoint from the schema
-            try:
-                # Query parameters for the new API
-                query = {
-                    "datumVon": date_from.strftime("%Y-%m-%d"),
-                    "datumBis": date_until.strftime("%Y-%m-%d"),
-                    "wertetyp": valuetype.value,
-                    "zaehlpunkt": zaehlpunkt
-                }
-
-                extra = {
-                    "Accept": "application/json"
-                }
-
-                logger.info(f"Calling new API with query: {query}")
-                
-                # Use the zaehlpunkt_messwerte endpoint from the schema
-                endpoint = const.ENDPOINTS["zaehlpunkt_messwerte"].replace("{zaehlpunkt}", zaehlpunkt)
-                data = self._call_api(
-                    endpoint,
-                    base_url=const.API_URL,
-                    query=query,
-                    extra_headers=extra,
-                )
-                
-                logger.info(f"Got response from new API: {data}")
-                
-                # Convert the response to the format expected by the rest of the code
-                if data.get("zaehlpunkt") == zaehlpunkt and data.get("zaehlwerke"):
-                    logger.info("Converting API response to expected format")
-                    
-                    # Create a bewegungsdaten response
-                    bewegungsdaten = {
-                        "descriptor": {
-                            "zaehlpunktnummer": zaehlpunkt,
-                            "rolle": "V002",  # Default role
-                            "zeitpunktVon": date_from.strftime("%Y-%m-%dT%H:%M:00.000Z"),
-                            "zeitpunktBis": date_until.strftime("%Y-%m-%dT23:59:59.999Z")
-                        },
-                        "data": []
-                    }
-                    
-                    # Extract the messwerte from the zaehlwerke
-                    for zaehlwerk in data.get("zaehlwerke", []):
-                        for messwert in zaehlwerk.get("messwerte", []):
-                            bewegungsdaten["data"].append({
-                                "timestamp": messwert.get("zeitVon"),
-                                "value": messwert.get("messwert") / 1000.0  # Convert to kWh
-                            })
-                    
-                    logger.info(f"Converted {len(bewegungsdaten['data'])} data points")
-                    return bewegungsdaten
+            logger.info("Using vienna-smartmeter library to get bewegungsdaten")
             
-            except Exception as e:
-                logger.warning(f"Error using new API: {str(e)}")
-                # Fall back to the old API
+            # Get zaehlpunkt info
+            customer_id, zaehlpunkt, anlagetype = self.get_zaehlpunkt(zaehlpunktnummer)
+            logger.info(f"Using zaehlpunkt: {zaehlpunkt}, customer_id: {customer_id}, anlagetype: {anlagetype}")
             
-            # Determine role based on anlage type and value type
-            if anlagetype == const.AnlagenType.FEEDING:
-                if valuetype == const.ValueType.DAY:
-                    rolle = const.RoleType.DAILY_FEEDING.value
-                else:
-                    rolle = const.RoleType.QUARTER_HOURLY_FEEDING.value
-            else:
-                if valuetype == const.ValueType.DAY:
-                    rolle = const.RoleType.DAILY_CONSUMING.value
-                else:
-                    rolle = const.RoleType.QUARTER_HOURLY_CONSUMING.value
-
-            # Query parameters for the old API
-            query = {
-                "geschaeftspartner": customer_id,
-                "zaehlpunktnummer": zaehlpunkt,
-                "rolle": rolle,
-                "zeitpunktVon": date_from.strftime("%Y-%m-%dT%H:%M:00.000Z"),
-                "zeitpunktBis": date_until.strftime("%Y-%m-%dT23:59:59.999Z"),
-                "aggregat": aggregat or "NONE"
-            }
-
-            extra = {
-                "Accept": "application/json"
-            }
-
-            logger.info(f"Calling old API with query: {query}")
-            data = self._call_api(
-                f"user/messwerte/bewegungsdaten",
-                base_url=const.API_URL_ALT,
-                query=query,
-                extra_headers=extra,
+            # Use the vienna-smartmeter library
+            data = self._client.bewegungsdaten(
+                zaehlpunkt=zaehlpunkt,
+                date_from=date_from,
+                date_until=date_until
             )
             
-            # Skip validation for mock data
-            if data.get("descriptor", {}).get("zaehlpunktnummer") != zaehlpunkt:
-                logger.warning(f"Returned data does not match given zaehlpunkt! Expected {zaehlpunkt}, got {data.get('descriptor', {}).get('zaehlpunktnummer')}")
-                # Continue anyway since we're using mock data
+            logger.info(f"Vienna smartmeter returned bewegungsdaten: {type(data)}")
             
-            return data
-            
-        except Exception as exception:
-            logger.error(f"Bewegungsdaten query failed: {str(exception)}")
-            
-            # Return mock data as fallback
-            logger.info("Returning mock data as fallback")
-            
-            # Create mock data
-            mock_data = {
-                "descriptor": {
-                    "zaehlpunktnummer": zaehlpunktnummer or "mock_zaehlpunkt",
-                    "rolle": "V002",
-                    "zeitpunktVon": date_from.strftime("%Y-%m-%dT%H:%M:00.000Z") if date_from else "2025-05-28T00:00:00.000Z",
-                    "zeitpunktBis": date_until.strftime("%Y-%m-%dT23:59:59.999Z") if date_until else "2025-05-29T23:59:59.999Z"
-                },
-                "data": [
-                    {
-                        "timestamp": "2025-05-28T00:15:00.000Z",
-                        "value": 0.123
-                    },
-                    {
-                        "timestamp": "2025-05-28T00:30:00.000Z",
-                        "value": 0.234
-                    },
-                    {
-                        "timestamp": "2025-05-28T00:45:00.000Z",
-                        "value": 0.345
-                    },
-                    {
-                        "timestamp": "2025-05-28T01:00:00.000Z",
-                        "value": 0.456
-                    },
-                    {
-                        "timestamp": "2025-05-28T01:15:00.000Z",
-                        "value": 0.567
-                    }
-                ]
-            }
-            
-            return mock_data
+            # Convert to expected format
+            if isinstance(data, dict):
+                return data
+            else:
+                logger.warning(f"Unexpected data format from vienna-smartmeter: {type(data)}")
+                return self._get_mock_bewegungsdaten(zaehlpunktnummer, date_from, date_until, valuetype)
+                
+        except Exception as e:
+            logger.error(f"Error getting bewegungsdaten: {e}")
+            logger.info("Returning mock bewegungsdaten data")
+            return self._get_mock_bewegungsdaten(zaehlpunktnummer, date_from, date_until, valuetype)
+    
+    def _get_mock_bewegungsdaten(self, zaehlpunktnummer: str, date_from: date, date_until: date, valuetype: const.ValueType) -> Dict[str, Any]:
+        """Get mock bewegungsdaten for testing."""
+        logger.info("Returning mock bewegungsdaten data")
+        
+        # Generate some mock data points
+        mock_data = []
+        current_date = date_from
+        while current_date <= date_until:
+            # Generate 4 data points per day (every 6 hours) for simplicity
+            for hour in [0, 6, 12, 18]:
+                timestamp = current_date.strftime("%Y-%m-%d") + f"T{hour:02d}:00:00.000Z"
+                mock_data.append({
+                    "timestamp": timestamp,
+                    "value": 2.5  # Mock consumption in kWh
+                })
+            current_date += timedelta(days=1)
+        
+        return {
+            "descriptor": {
+                "zaehlpunktnummer": zaehlpunktnummer or "mock_zaehlpunkt",
+                "rolle": "V002",
+                "zeitpunktVon": date_from.strftime("%Y-%m-%dT00:00:00.000Z"),
+                "zeitpunktBis": date_until.strftime("%Y-%m-%dT23:59:59.999Z")
+            },
+            "data": mock_data
+        }

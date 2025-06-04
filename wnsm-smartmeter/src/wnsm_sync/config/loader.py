@@ -29,6 +29,7 @@ class WNSMConfig:
     update_interval: int = 3600  # 1 hour
     history_days: int = 1
     use_mock_data: bool = False
+    use_oauth: bool = True  # Whether to use OAuth authentication (disable for testing)
     use_secrets: bool = False  # Whether to use secrets.yaml for credentials
     retry_count: int = 3
     retry_delay: int = 10
@@ -86,6 +87,7 @@ class ConfigLoader:
         "update_interval": ["UPDATE_INTERVAL"],
         "history_days": ["HISTORY_DAYS"],
         "use_mock_data": ["WNSM_USE_MOCK_DATA", "USE_MOCK_DATA"],
+        "use_oauth": ["USE_OAUTH"],
         "use_secrets": ["USE_SECRETS"],
         "retry_count": ["RETRY_COUNT"],
         "retry_delay": ["RETRY_DELAY"],
@@ -97,7 +99,7 @@ class ConfigLoader:
     INT_FIELDS = {"mqtt_port", "update_interval", "history_days", "retry_count", "retry_delay", "api_timeout"}
     
     # Fields that should be converted to booleans
-    BOOL_FIELDS = {"use_mock_data", "use_secrets", "debug"}
+    BOOL_FIELDS = {"use_mock_data", "use_oauth", "use_secrets", "debug"}
     
     def __init__(self, secrets_manager: Optional[SecretsManager] = None):
         """Initialize config loader.
