@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.38](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.37...v0.3.38) (2025-06-04)
+
+
+### Features
+
+* **tests:** add comprehensive tests for 15-minute resolution data retrieval and processing ([b2c53da](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/b2c53da0fd733863c491122e8704f23fabb52a4e))
+
 ### [0.3.37](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.36...v0.3.37) (2025-06-04)
 
 
