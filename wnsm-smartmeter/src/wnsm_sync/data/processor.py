@@ -32,12 +32,21 @@ class DataProcessor:
             EnergyData object with processed readings, or None if processing fails
         """
         try:
-            if not raw_data or "values" not in raw_data:
-                logger.warning("No values found in bewegungsdaten response")
+            # Support both formats: converted format with "data" and original format with "values"
+            if not raw_data:
+                logger.warning("No data found in bewegungsdaten response")
+                return None
+            
+            # Check for converted format first (our new format)
+            if "data" in raw_data:
+                values = raw_data["data"]
+            elif "values" in raw_data:
+                values = raw_data["values"]
+            else:
+                logger.warning("No values or data found in bewegungsdaten response")
                 return None
             
             readings = []
-            values = raw_data["values"]
             
             logger.info(f"Processing {len(values)} raw data points")
             
@@ -87,23 +96,34 @@ class DataProcessor:
             EnergyReading object or None if processing fails
         """
         try:
-            # Extract timestamp
-            if "zeitpunkt" in entry:
+            # Extract timestamp - support both converted and original formats
+            timestamp_str = None
+            if "timestamp" in entry:  # Converted format
+                timestamp_str = entry["timestamp"]
+            elif "zeitpunkt" in entry:  # Original format
                 timestamp_str = entry["zeitpunkt"]
-                timestamp = self._parse_timestamp(timestamp_str)
-            else:
+            elif "zeitpunktVon" in entry:  # Vienna-smartmeter format
+                timestamp_str = entry["zeitpunktVon"]
+            
+            if not timestamp_str:
                 logger.warning(f"No timestamp found in entry: {entry}")
                 return None
+                
+            timestamp = self._parse_timestamp(timestamp_str)
             
-            # Extract value
-            if "wert" in entry:
+            # Extract value - support both converted and original formats
+            value_kwh = None
+            if "value" in entry:  # Converted format
+                value_kwh = float(entry["value"])
+            elif "wert" in entry:  # Original/Vienna-smartmeter format
                 value_kwh = float(entry["wert"])
-            else:
+            
+            if value_kwh is None:
                 logger.warning(f"No value found in entry: {entry}")
                 return None
             
-            # Extract quality if available
-            quality = entry.get("qualitaet")
+            # Extract quality if available - support both formats
+            quality = entry.get("quality") or entry.get("qualitaet")
             
             return EnergyReading(
                 timestamp=timestamp,
