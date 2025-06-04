@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def with_retry(func: Callable, config: WNSMConfig, *args, **kwargs) -> Any:
-    """Execute a function with retry logic.
+    """Execute a function with retry logic and exponential backoff.
     
     Args:
         func: Function to execute
@@ -36,11 +36,16 @@ def with_retry(func: Callable, config: WNSMConfig, *args, **kwargs) -> Any:
         except Exception as e:
             last_exception = e
             if attempt < config.retry_count:
+                # Exponential backoff: delay increases with each attempt
+                delay = config.retry_delay * (2 ** attempt)
+                # Cap the delay at 5 minutes
+                delay = min(delay, 300)
+                
                 logger.warning(
                     f"Attempt {attempt + 1}/{config.retry_count + 1} failed: {e}. "
-                    f"Retrying in {config.retry_delay} seconds..."
+                    f"Retrying in {delay} seconds..."
                 )
-                time.sleep(config.retry_delay)
+                time.sleep(delay)
             else:
                 logger.error(f"All {config.retry_count + 1} attempts failed")
     

@@ -23,18 +23,20 @@ logger = logging.getLogger(__name__)
 class Smartmeter:
     """Smartmeter client for accessing the API."""
 
-    def __init__(self, username: str, password: str, use_mock: bool = False):
+    def __init__(self, username: str, password: str, use_mock: bool = False, api_timeout: int = 60):
         """Initialize the Smartmeter API client.
 
         Args:
             username (str): Username used for API login.
             password (str): Password used for API login.
             use_mock (bool, optional): Use mock data instead of real API calls. Defaults to False.
+            api_timeout (int, optional): API request timeout in seconds. Defaults to 60.
         """
         self.username = username
         self.password = password
         self.session = requests.Session()
         self._use_mock = use_mock
+        self.api_timeout = api_timeout
         self._access_token = None
         self._refresh_token = None
         self._api_gateway_token = None
@@ -425,7 +427,7 @@ class Smartmeter:
         data: dict = None,
         query: dict = None,
         return_response: bool = False,
-        timeout: float = 60.0,
+        timeout: float = None,
         extra_headers: dict = None,
     ):
         """Make an API call to the specified endpoint.
@@ -448,6 +450,10 @@ class Smartmeter:
         """
         logger.info(f"API call to {endpoint} (base: {base_url})")
         logger.info(f"Checking token validity")
+        
+        # Use instance timeout if none provided
+        if timeout is None:
+            timeout = self.api_timeout
         
         # Check if we should use mock data
         # This can be controlled via configuration
@@ -677,16 +683,44 @@ class Smartmeter:
                 
             return response.json()
             
-        except requests.exceptions.RequestException as exception:
-            status_code = getattr(exception.response, "status_code", None)
-            content = getattr(exception.response, "content", b"").decode("utf-8", errors="ignore")
-            logger.error(f"API request failed: {url} - Status: {status_code}, Error: {content}")
+        except requests.exceptions.Timeout as e:
+            error_msg = f"Request timeout after {timeout} seconds"
+            logger.error(f"API request timeout: {url} - {error_msg}")
             raise SmartmeterConnectionError(
-                f"API request failed: {url} - Status: {status_code}, Error: {content}"
-            ) from exception
+                f"API request timeout: {url} - {error_msg}"
+            ) from e
+        except requests.exceptions.ConnectionError as e:
+            error_msg = f"Connection error: {str(e)}"
+            logger.error(f"API connection error: {url} - {error_msg}")
+            raise SmartmeterConnectionError(
+                f"API connection error: {url} - {error_msg}"
+            ) from e
+        except requests.exceptions.HTTPError as e:
+            status_code = getattr(e.response, "status_code", None)
+            content = getattr(e.response, "content", b"").decode("utf-8", errors="ignore")
+            error_msg = f"HTTP {status_code}: {content[:200]}"
+            logger.error(f"API HTTP error: {url} - {error_msg}")
+            raise SmartmeterConnectionError(
+                f"API HTTP error: {url} - {error_msg}"
+            ) from e
+        except requests.exceptions.RequestException as e:
+            status_code = getattr(e.response, "status_code", None) if hasattr(e, 'response') and e.response else None
+            content = getattr(e.response, "content", b"").decode("utf-8", errors="ignore") if hasattr(e, 'response') and e.response else ""
+            error_msg = f"Request failed: {str(e)}"
+            logger.error(f"API request failed: {url} - Status: {status_code}, Error: {error_msg}")
+            raise SmartmeterConnectionError(
+                f"API request failed: {url} - Status: {status_code}, Error: {error_msg}"
+            ) from e
+        except json.JSONDecodeError as e:
+            error_msg = f"Invalid JSON response: {str(e)}"
+            logger.error(f"API JSON decode error: {url} - {error_msg}")
+            raise SmartmeterConnectionError(
+                f"API JSON decode error: {url} - {error_msg}"
+            ) from e
         except Exception as e:
-            logger.error(f"Unexpected error in API call: {str(e)}")
-            raise SmartmeterConnectionError(f"Unexpected error in API call: {str(e)}")
+            error_msg = f"Unexpected error: {str(e)}"
+            logger.error(f"Unexpected error in API call: {url} - {error_msg}")
+            raise SmartmeterConnectionError(f"Unexpected error in API call: {url} - {error_msg}") from e
         
         # The code below is kept for reference but not used
         """

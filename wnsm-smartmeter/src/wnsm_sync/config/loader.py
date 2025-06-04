@@ -32,6 +32,7 @@ class WNSMConfig:
     use_secrets: bool = False  # Whether to use secrets.yaml for credentials
     retry_count: int = 3
     retry_delay: int = 10
+    api_timeout: int = 60  # API request timeout in seconds
     debug: bool = False
     
     # Advanced options
@@ -88,11 +89,12 @@ class ConfigLoader:
         "use_secrets": ["USE_SECRETS"],
         "retry_count": ["RETRY_COUNT"],
         "retry_delay": ["RETRY_DELAY"],
+        "api_timeout": ["API_TIMEOUT"],
         "debug": ["DEBUG"]
     }
     
     # Fields that should be converted to integers
-    INT_FIELDS = {"mqtt_port", "update_interval", "history_days", "retry_count", "retry_delay"}
+    INT_FIELDS = {"mqtt_port", "update_interval", "history_days", "retry_count", "retry_delay", "api_timeout"}
     
     # Fields that should be converted to booleans
     BOOL_FIELDS = {"use_mock_data", "use_secrets", "debug"}

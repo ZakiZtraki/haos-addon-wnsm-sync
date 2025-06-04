@@ -39,7 +39,8 @@ class WNSMSync:
             self._api_client = Smartmeter(
                 username=self.config.wnsm_username,
                 password=self.config.wnsm_password,
-                use_mock=self.config.use_mock_data
+                use_mock=self.config.use_mock_data,
+                api_timeout=self.config.api_timeout
             )
             # Try to load existing session
             self.session_manager.load_session(self._api_client)
