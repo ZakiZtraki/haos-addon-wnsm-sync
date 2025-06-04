@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.34](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.33...v0.3.34) (2025-06-04)
+
+
+### Features
+
+* **api:** enhance data handling and logging in Smartmeter client ([798405f](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/798405f146da4516b797f0a1f95270881b115c74))
+
 ### [0.3.33](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.32...v0.3.33) (2025-06-04)
 
 
