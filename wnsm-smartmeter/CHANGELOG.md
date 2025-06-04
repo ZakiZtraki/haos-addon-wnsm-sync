@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.32](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.31...v0.3.32) (2025-06-04)
+
+
+### Features
+
+* **oauth:** added OAuth functionality ([a54b04f](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/a54b04f6a31ee7befed752293133a569c713f5ba))
+
 ### [0.3.31](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.30...v0.3.31) (2025-06-04)
 
 
