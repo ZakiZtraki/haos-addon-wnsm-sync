@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.29](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.28...v0.3.29) (2025-06-04)
+
+
+### Features
+
+* **mqtt:** implement message retention in MQTT publishing and add tests ([5db379e](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/5db379e58ca424907853c6b6a3bb41c33d897abe))
+
 ### [0.3.28](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.27...v0.3.28) (2025-06-04)
 
 
