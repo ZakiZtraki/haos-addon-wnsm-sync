@@ -84,3 +84,34 @@ def test_missing_required_config():
             zp="AT0010000000000000001000004392265",
             mqtt_host="localhost"
         )
+
+def test_bewegungsdaten_parameter_fix_integration(monkeypatch):
+    """Test that the bewegungsdaten parameter fix works in the full sync flow."""
+    # Set up environment for mock data
+    monkeypatch.setenv("WNSM_USERNAME", "test_user")
+    monkeypatch.setenv("WNSM_PASSWORD", "test_pass")
+    monkeypatch.setenv("ZP", "AT0010000000000000001000004392265")
+    monkeypatch.setenv("MQTT_HOST", "localhost")
+    monkeypatch.setenv("USE_MOCK_DATA", "true")
+    
+    # Load config and create sync
+    loader = ConfigLoader()
+    config = loader.load()
+    sync = WNSMSync(config)
+    
+    # Test that the API client is created correctly
+    api_client = sync.api_client
+    assert api_client is not None
+    
+    # Test that we can fetch data (this will internally call bewegungsdaten with correct parameters)
+    energy_data = sync.fetch_energy_data()
+    assert energy_data is not None
+    assert len(energy_data.readings) > 0
+    
+    # Verify that the data has the expected structure
+    for reading in energy_data.readings:
+        assert hasattr(reading, 'value_kwh')
+        assert hasattr(reading, 'timestamp')
+        assert reading.value_kwh > 0
+    
+    print("✓ Integration test: bewegungsdaten parameter fix works in full sync flow")

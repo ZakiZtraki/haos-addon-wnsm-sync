@@ -114,7 +114,7 @@ class WNSMSync:
             raw_data = with_retry(
                 self.api_client.bewegungsdaten,
                 self.config,
-                zaehlpunkt=self.config.zp,
+                zaehlpunktnummer=self.config.zp,
                 date_from=date_from,
                 date_until=date_until
             )
