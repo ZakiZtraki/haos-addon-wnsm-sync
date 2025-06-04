@@ -29,6 +29,7 @@ class WNSMConfig:
     update_interval: int = 3600  # 1 hour
     history_days: int = 1
     use_mock_data: bool = False
+    use_secrets: bool = False  # Whether to use secrets.yaml for credentials
     retry_count: int = 3
     retry_delay: int = 10
     debug: bool = False
@@ -84,6 +85,7 @@ class ConfigLoader:
         "update_interval": ["UPDATE_INTERVAL"],
         "history_days": ["HISTORY_DAYS"],
         "use_mock_data": ["WNSM_USE_MOCK_DATA", "USE_MOCK_DATA"],
+        "use_secrets": ["USE_SECRETS"],
         "retry_count": ["RETRY_COUNT"],
         "retry_delay": ["RETRY_DELAY"],
         "debug": ["DEBUG"]
@@ -93,7 +95,7 @@ class ConfigLoader:
     INT_FIELDS = {"mqtt_port", "update_interval", "history_days", "retry_count", "retry_delay"}
     
     # Fields that should be converted to booleans
-    BOOL_FIELDS = {"use_mock_data", "debug"}
+    BOOL_FIELDS = {"use_mock_data", "use_secrets", "debug"}
     
     def __init__(self, secrets_manager: Optional[SecretsManager] = None):
         """Initialize config loader.
@@ -138,8 +140,9 @@ class ConfigLoader:
             # Handle unexpected keyword arguments
             logger.error(f"Invalid configuration parameters: {e}")
             # Filter out unknown parameters
-            valid_fields = {f.name for f in WNSMConfig.__dataclass_fields__.values()}
+            valid_fields = set(WNSMConfig.__dataclass_fields__.keys())
             filtered_config = {k: v for k, v in config_dict.items() if k in valid_fields}
+            logger.info(f"Filtered config to valid fields: {list(filtered_config.keys())}")
             return WNSMConfig(**filtered_config)
     
     def _load_from_options_file(self, config_dict: Dict[str, Any]):
