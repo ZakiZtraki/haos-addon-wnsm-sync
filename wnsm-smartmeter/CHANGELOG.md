@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.31](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.30...v0.3.31) (2025-06-04)
+
+
+### Bug Fixes
+
+* **api:** improve error handling, add conf timeout, implement exponential backoff for retries ([7fce834](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/7fce834c198b95a14da6444ef705eaf921a85859))
+
 ### [0.3.30](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.29...v0.3.30) (2025-06-04)
 
 
