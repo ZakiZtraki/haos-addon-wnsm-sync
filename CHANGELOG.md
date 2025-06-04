@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.30](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.29...v0.3.30) (2025-06-04)
+
+
+### Features
+
+* **config:** add use_secrets option to WNSMConfig and update environment mappings ([2be3d82](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/2be3d82fed39145c6ef8c8ecfa5fdeeddf1529f2))
+
 ### [0.3.29](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.28...v0.3.29) (2025-06-04)
 
 
