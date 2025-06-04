@@ -44,6 +44,16 @@ class WNSMConfig:
         "/data/secrets.yaml"
     ])
     
+    # Backfill options
+    enable_backfill: bool = False
+    use_python_backfill: bool = True  # Use Python implementation by default (better for Home Assistant OS)
+    ha_database_path: str = "/config/home-assistant_v2.db"
+    ha_backfill_binary: str = "/usr/local/bin/ha-backfill"
+    ha_import_metadata_id: Optional[str] = None  # Auto-detected if not specified
+    ha_export_metadata_id: Optional[str] = None
+    ha_generation_metadata_id: Optional[str] = None
+    ha_short_term_days: int = 14  # Days to keep short-term statistics
+    
     def __post_init__(self):
         """Validate configuration after initialization."""
         self._validate()
@@ -92,14 +102,22 @@ class ConfigLoader:
         "retry_count": ["RETRY_COUNT"],
         "retry_delay": ["RETRY_DELAY"],
         "api_timeout": ["API_TIMEOUT"],
-        "debug": ["DEBUG"]
+        "debug": ["DEBUG"],
+        "enable_backfill": ["ENABLE_BACKFILL"],
+        "use_python_backfill": ["USE_PYTHON_BACKFILL"],
+        "ha_database_path": ["HA_DATABASE_PATH"],
+        "ha_backfill_binary": ["HA_BACKFILL_BINARY"],
+        "ha_import_metadata_id": ["HA_IMPORT_METADATA_ID"],
+        "ha_export_metadata_id": ["HA_EXPORT_METADATA_ID"],
+        "ha_generation_metadata_id": ["HA_GENERATION_METADATA_ID"],
+        "ha_short_term_days": ["HA_SHORT_TERM_DAYS"]
     }
     
     # Fields that should be converted to integers
-    INT_FIELDS = {"mqtt_port", "update_interval", "history_days", "retry_count", "retry_delay", "api_timeout"}
+    INT_FIELDS = {"mqtt_port", "update_interval", "history_days", "retry_count", "retry_delay", "api_timeout", "ha_short_term_days"}
     
     # Fields that should be converted to booleans
-    BOOL_FIELDS = {"use_mock_data", "use_oauth", "use_secrets", "debug"}
+    BOOL_FIELDS = {"use_mock_data", "use_oauth", "use_secrets", "debug", "enable_backfill", "use_python_backfill"}
     
     def __init__(self, secrets_manager: Optional[SecretsManager] = None):
         """Initialize config loader.

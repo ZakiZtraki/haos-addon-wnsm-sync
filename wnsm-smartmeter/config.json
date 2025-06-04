@@ -42,7 +42,15 @@
         "DEBUG": "bool?",
         "USE_MOCK_DATA": "bool?",
         "HA_URL": "str?",
-        "STAT_ID": "str?"
+        "STAT_ID": "str?",
+        "ENABLE_BACKFILL": "bool?",
+        "USE_PYTHON_BACKFILL": "bool?",
+        "HA_DATABASE_PATH": "str?",
+        "HA_BACKFILL_BINARY": "str?",
+        "HA_IMPORT_METADATA_ID": "str?",
+        "HA_EXPORT_METADATA_ID": "str?",
+        "HA_GENERATION_METADATA_ID": "str?",
+        "HA_SHORT_TERM_DAYS": "int(1,365)?"
     },
     "build": true,
     "udev": true,

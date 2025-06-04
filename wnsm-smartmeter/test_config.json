@@ -1,0 +1,11 @@
+{
+    "WNSM_USERNAME": "test_user",
+    "WNSM_PASSWORD": "test_password",
+    "ZP": "AT0010000000000000000000001234567890",
+    "MQTT_HOST": "localhost",
+    "MQTT_PORT": 1883,
+    "ENABLE_BACKFILL": true,
+    "USE_PYTHON_BACKFILL": true,
+    "HA_DATABASE_PATH": "/config/home-assistant_v2.db",
+    "HA_BACKFILL_BINARY": "/usr/local/bin/ha-backfill"
+}

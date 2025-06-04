@@ -11,6 +11,7 @@ from ..data.processor import DataProcessor
 from ..data.models import EnergyData
 from ..mqtt.client import MQTTClient
 from ..mqtt.discovery import HomeAssistantDiscovery
+from ..backfill.ha_backfill import HABackfillIntegration
 from .utils import with_retry, SessionManager
 
 logger = logging.getLogger(__name__)
@@ -30,6 +31,7 @@ class WNSMSync:
         self.data_processor = DataProcessor()
         self.mqtt_client = MQTTClient(config)
         self.discovery = HomeAssistantDiscovery(config)
+        self.backfill_integration = HABackfillIntegration(config)
         self._api_client: Optional[Smartmeter] = None
     
     @property
@@ -148,8 +150,23 @@ class WNSMSync:
                     self._api_client.reset()
             return None
     
-    def publish_energy_data(self, energy_data: EnergyData) -> bool:
-        """Publish energy data to MQTT.
+    def publish_energy_data(self, energy_data: EnergyData, use_backfill: bool = False) -> bool:
+        """Publish energy data to MQTT or backfill to Home Assistant database.
+        
+        Args:
+            energy_data: Energy data to publish
+            use_backfill: If True, use database backfill instead of MQTT
+            
+        Returns:
+            True if all data was published successfully
+        """
+        if use_backfill:
+            return self._backfill_energy_data(energy_data)
+        else:
+            return self._publish_energy_data_mqtt(energy_data)
+    
+    def _publish_energy_data_mqtt(self, energy_data: EnergyData) -> bool:
+        """Publish energy data to MQTT (original method).
         
         Args:
             energy_data: Energy data to publish
@@ -177,6 +194,28 @@ class WNSMSync:
         
         logger.info(f"Published {success_count}/{total_readings} energy readings")
         return success_count == total_readings
+    
+    def _backfill_energy_data(self, energy_data: EnergyData) -> bool:
+        """Backfill energy data directly to Home Assistant database.
+        
+        Args:
+            energy_data: Energy data to backfill
+            
+        Returns:
+            True if backfill was successful
+        """
+        logger.info(f"Backfilling {energy_data.reading_count} energy readings to Home Assistant database")
+        
+        success = self.backfill_integration.backfill_energy_data(energy_data)
+        
+        if success:
+            logger.info("Successfully backfilled energy data to Home Assistant")
+            # Still publish daily total to MQTT for status
+            self._publish_daily_total(energy_data)
+        else:
+            logger.error("Failed to backfill energy data")
+        
+        return success
     
     def _publish_daily_total(self, energy_data: EnergyData) -> bool:
         """Publish daily total energy consumption.
@@ -253,8 +292,11 @@ class WNSMSync:
             logger.error(f"Failed to publish availability: {e}")
             return False
     
-    def run_sync_cycle(self) -> bool:
+    def run_sync_cycle(self, force_backfill: bool = False) -> bool:
         """Run a single synchronization cycle.
+        
+        Args:
+            force_backfill: If True, force use of database backfill instead of MQTT
         
         Returns:
             True if sync was successful, False otherwise
@@ -270,8 +312,11 @@ class WNSMSync:
                 self.publish_status("error", "Failed to fetch energy data")
                 return False
             
+            # Determine whether to use backfill or MQTT
+            use_backfill = force_backfill or self._should_use_backfill(energy_data)
+            
             # Publish energy data
-            if not self.publish_energy_data(energy_data):
+            if not self.publish_energy_data(energy_data, use_backfill=use_backfill):
                 self.publish_status("error", "Failed to publish some energy data")
                 return False
             
@@ -284,6 +329,40 @@ class WNSMSync:
             logger.error(f"Sync cycle failed: {e}")
             self.publish_status("error", str(e))
             return False
+    
+    def _should_use_backfill(self, energy_data: EnergyData) -> bool:
+        """Determine whether to use database backfill or MQTT publishing.
+        
+        Args:
+            energy_data: Energy data to evaluate
+            
+        Returns:
+            True if backfill should be used, False for MQTT
+        """
+        # Use backfill if:
+        # 1. Backfill is enabled in config
+        # 2. Data spans more than 1 day (historical data)
+        # 3. Data is older than 24 hours
+        
+        backfill_enabled = getattr(self.config, 'enable_backfill', False)
+        if not backfill_enabled:
+            return False
+        
+        # Check if data spans multiple days
+        date_span = (energy_data.date_until - energy_data.date_from).days
+        if date_span > 1:
+            logger.info(f"Data spans {date_span} days, using backfill")
+            return True
+        
+        # Check if data is older than 24 hours
+        hours_old = (datetime.now() - energy_data.date_until).total_seconds() / 3600
+        if hours_old > 24:
+            logger.info(f"Data is {hours_old:.1f} hours old, using backfill")
+            return True
+        
+        # Use MQTT for recent data
+        logger.info("Using MQTT for recent data")
+        return False
     
     def run_continuous(self) -> None:
         """Run continuous synchronization loop."""
