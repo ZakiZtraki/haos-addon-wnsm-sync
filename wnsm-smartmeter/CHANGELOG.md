@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.42](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.41...v0.3.42) (2025-06-05)
+
+
+### Bug Fixes
+
+* update token usage in workflows to use PAT_TOKEN for GitHub actions ([5b37696](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/5b3769671133a94da5f92c6a80e2d4aca7ee4ce4))
+
 ### [0.3.41](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.40...v0.3.41) (2025-06-05)
 
 
