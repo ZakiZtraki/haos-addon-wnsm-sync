@@ -97,8 +97,36 @@ jobs:
           ghcr.io/${{ steps.repo.outputs.owner }}/haos-addon-wnsm-sync:latest
           ghcr.io/${{ steps.repo.outputs.owner }}/haos-addon-wnsm-sync:${{ steps.version.outputs.version }}
 
-    - name: Push changes
-      run: |
-        git add .
-        git commit -m "chore(release): update version and changelog for ${{ steps.version.outputs.version }}"
-        git push origin main --follow-tags
+    - name: Create Release Pull Request
+      uses: peter-evans/create-pull-request@v7
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "chore(release): update version and changelog for v${{ steps.version.outputs.version }}"
+        title: "🚀 Release v${{ steps.version.outputs.version }}"
+        body: |
+          ## 🚀 Release v${{ steps.version.outputs.version }}
+          
+          This pull request contains the automated release changes:
+          
+          ### Changes Made:
+          - ✅ Updated version in `package.json` to v${{ steps.version.outputs.version }}
+          - ✅ Generated/updated `CHANGELOG.md` with release notes
+          - ✅ Updated `wnsm-smartmeter/config.json` version
+          - ✅ Copied changelog to addon directory
+          - ✅ Built and pushed Docker image to registry
+          - ✅ Created Git tags
+          
+          ### Docker Images:
+          - `ghcr.io/${{ steps.repo.outputs.owner }}/haos-addon-wnsm-sync:latest`
+          - `ghcr.io/${{ steps.repo.outputs.owner }}/haos-addon-wnsm-sync:v${{ steps.version.outputs.version }}`
+          
+          **🔄 Merge this PR to complete the release and sync changes to your local development environment.**
+        branch: release/v${{ steps.version.outputs.version }}
+        delete-branch: true
+        base: main
+        labels: |
+          🚀 release
+          automated
+    
+    - name: Push tags only
+      run: git push origin --tags
