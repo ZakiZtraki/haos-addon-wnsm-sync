@@ -53,6 +53,8 @@ The addon automatically finds sensors created by MQTT discovery:
 
 Where `{zp_last8}` is the last 8 digits of your Zählpunkt.
 
+**Note:** The addon now correctly configures MQTT discovery to create sensors with these exact entity IDs.
+
 #### Manual Override (Optional)
 If you want to use a different sensor or auto-detection fails:
 

@@ -37,6 +37,7 @@ class HomeAssistantDiscovery:
         # Sensor configuration
         sensor_config = {
             "name": "WNSM 15min Energy",
+            "object_id": sensor_name,  # This controls the entity_id
             "unique_id": sensor_name,
             "state_topic": state_topic,
             "unit_of_measurement": "kWh",
@@ -83,6 +84,7 @@ class HomeAssistantDiscovery:
         # Sensor configuration
         sensor_config = {
             "name": "WNSM Daily Total",
+            "object_id": sensor_name,  # This controls the entity_id
             "unique_id": sensor_name,
             "state_topic": state_topic,
             "unit_of_measurement": "kWh",
@@ -129,6 +131,7 @@ class HomeAssistantDiscovery:
         # Sensor configuration
         sensor_config = {
             "name": "WNSM Sync Status",
+            "object_id": sensor_name,  # This controls the entity_id
             "unique_id": sensor_name,
             "state_topic": state_topic,
             "value_template": "{{ value_json.status }}",
