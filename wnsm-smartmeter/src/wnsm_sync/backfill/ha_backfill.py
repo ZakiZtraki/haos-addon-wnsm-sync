@@ -29,7 +29,7 @@ class HABackfillIntegration:
         self.python_backfill = PythonBackfill(config)
         
         # Configuration for ha-backfill
-        self.ha_database_path = getattr(config, 'ha_database_path', '/config/home-assistant_v2.db')
+        self.ha_database_path = getattr(config, 'ha_database_path', '/homeassistant/home-assistant_v2.db')
         self.ha_backfill_binary = getattr(config, 'ha_backfill_binary', '/usr/local/bin/ha-backfill')
         
         # Metadata IDs for Home Assistant sensors (these need to be configured)

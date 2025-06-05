@@ -63,7 +63,7 @@ python3 backfill_setup.py test --config /data/options.json
 
 Or query the database directly:
 ```bash
-sqlite3 /config/home-assistant_v2.db
+sqlite3 /homeassistant/home-assistant_v2.db
 ```
 ```sql
 SELECT id, statistic_id, source, unit_of_measurement, name
@@ -91,8 +91,8 @@ enable_backfill: true
 # Use Python implementation (default, recommended for Home Assistant OS)
 use_python_backfill: true
 
-# Home Assistant database path (default: /config/home-assistant_v2.db)
-ha_database_path: "/config/home-assistant_v2.db"
+# Home Assistant database path (default: /homeassistant/home-assistant_v2.db)
+ha_database_path: "/homeassistant/home-assistant_v2.db"
 
 # Manual sensor metadata ID override (auto-detected if not specified)
 # ha_import_metadata_id: "14"
@@ -148,7 +148,7 @@ sync.run_sync_cycle(force_backfill=True)
 | Option | Default | Description |
 |--------|---------|-------------|
 | `enable_backfill` | `false` | Enable automatic backfill for historical data |
-| `ha_database_path` | `/config/home-assistant_v2.db` | Path to Home Assistant database |
+| `ha_database_path` | `/homeassistant/home-assistant_v2.db` | Path to Home Assistant database |
 | `ha_backfill_binary` | `/usr/local/bin/ha-backfill` | Path to ha-backfill executable |
 | `ha_import_metadata_id` | `None` | Metadata ID for energy import sensor (required) |
 | `ha_export_metadata_id` | `None` | Metadata ID for energy export sensor (optional) |
@@ -208,7 +208,7 @@ python3 backfill_setup.py test
 
 View available sensors:
 ```bash
-sqlite3 /config/home-assistant_v2.db "SELECT id, statistic_id FROM statistics_meta WHERE unit_of_measurement = 'kWh';"
+sqlite3 /homeassistant/home-assistant_v2.db "SELECT id, statistic_id FROM statistics_meta WHERE unit_of_measurement = 'kWh';"
 ```
 
 Test ha-backfill installation:
@@ -218,11 +218,19 @@ ha-backfill -h
 
 ## Best Practices
 
-### 1. Stop Home Assistant During Backfill
-Always stop Home Assistant before running backfill operations to avoid database conflicts:
+### 1. Database Safety During Backfill
+
+**For Home Assistant OS (Recommended Approach):**
+The Python backfill implementation uses proper database transactions and locking, so Home Assistant doesn't need to be stopped. The backfill process:
+- Uses SQLite WAL mode for concurrent access
+- Implements proper transaction handling
+- Uses database locks to prevent conflicts
+
+**For Manual/External Systems:**
+If running ha-backfill externally, you may need to stop Home Assistant:
 
 ```bash
-# Stop Home Assistant
+# Stop Home Assistant (only for external systems)
 sudo systemctl stop home-assistant
 
 # Run backfill
@@ -236,7 +244,7 @@ sudo systemctl start home-assistant
 Before running backfill operations, backup your Home Assistant database:
 
 ```bash
-cp /config/home-assistant_v2.db /config/home-assistant_v2.db.backup
+cp /homeassistant/home-assistant_v2.db /homeassistant/home-assistant_v2.db.backup
 ```
 
 ### 3. Test with Mock Data First

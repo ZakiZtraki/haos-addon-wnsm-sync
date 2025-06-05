@@ -47,7 +47,7 @@ class WNSMConfig:
     # Backfill options
     enable_backfill: bool = False
     use_python_backfill: bool = True  # Use Python implementation by default (better for Home Assistant OS)
-    ha_database_path: str = "/config/home-assistant_v2.db"
+    ha_database_path: str = "/homeassistant/home-assistant_v2.db"
     ha_backfill_binary: str = "/usr/local/bin/ha-backfill"
     ha_import_metadata_id: Optional[str] = None  # Auto-detected if not specified
     ha_export_metadata_id: Optional[str] = None

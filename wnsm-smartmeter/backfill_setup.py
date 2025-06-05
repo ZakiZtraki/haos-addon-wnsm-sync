@@ -41,7 +41,7 @@ def load_test_config(config_path: str):
         mqtt_port=config_data.get('MQTT_PORT', 1883),
         enable_backfill=config_data.get('ENABLE_BACKFILL', False),
         use_python_backfill=config_data.get('USE_PYTHON_BACKFILL', True),
-        ha_database_path=config_data.get('HA_DATABASE_PATH', '/config/home-assistant_v2.db'),
+        ha_database_path=config_data.get('HA_DATABASE_PATH', '/homeassistant/home-assistant_v2.db'),
         ha_backfill_binary=config_data.get('HA_BACKFILL_BINARY', '/usr/local/bin/ha-backfill'),
         ha_import_metadata_id=config_data.get('HA_IMPORT_METADATA_ID', None),  # Auto-detected if None
         ha_export_metadata_id=config_data.get('HA_EXPORT_METADATA_ID', None),

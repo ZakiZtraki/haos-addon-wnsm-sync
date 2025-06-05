@@ -31,7 +31,7 @@ class PythonBackfill:
         self.csv_exporter = CSVExporter()
         
         # Configuration for Home Assistant database
-        self.ha_database_path = getattr(config, 'ha_database_path', '/config/home-assistant_v2.db')
+        self.ha_database_path = getattr(config, 'ha_database_path', '/homeassistant/home-assistant_v2.db')
         
         # Metadata IDs for Home Assistant sensors
         self.import_metadata_id = getattr(config, 'ha_import_metadata_id', None)

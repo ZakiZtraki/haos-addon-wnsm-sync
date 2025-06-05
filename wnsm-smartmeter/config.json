@@ -10,7 +10,12 @@
     ],
     "startup": "application",
     "boot": "auto",
-    "map": [],
+    "map": [
+        {
+            "type": "homeassistant_config",
+            "read_only": false
+        }
+    ],
     "hassio_api": true,
     "homeassistant_api": true,
     "timeout": "300",
