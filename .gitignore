@@ -91,3 +91,4 @@ Thumbs.db
 # Git
 .git/
 wnsm-sync.log
+wnsm-smartmeter/test_sensor_names.py
