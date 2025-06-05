@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.40](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.39...v0.3.40) (2025-06-05)
+
+
+### Bug Fixes
+
+* update Home Assistant database path in configuration and documentation ([32f4f79](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/32f4f798b44cd85f75f08d56b9f6fde2b8418711))
+
 ### [0.3.39](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.38...v0.3.39) (2025-06-04)
 
 
