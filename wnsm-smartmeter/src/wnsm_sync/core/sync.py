@@ -11,7 +11,7 @@ from ..data.processor import DataProcessor
 from ..data.models import EnergyData
 from ..mqtt.client import MQTTClient
 from ..mqtt.discovery import HomeAssistantDiscovery
-from ..backfill.python_backfill import PythonBackfill
+from ..backfill.python_backfill import PythonBackfill, normalize_timestamp_to_utc
 from .utils import with_retry, SessionManager
 
 logger = logging.getLogger(__name__)
@@ -348,14 +348,19 @@ class WNSMSync:
         if not backfill_enabled:
             return False
         
+        # Normalize timestamps to avoid timezone comparison issues
+        date_from_utc = normalize_timestamp_to_utc(energy_data.date_from)
+        date_until_utc = normalize_timestamp_to_utc(energy_data.date_until)
+        now_utc = datetime.utcnow()
+        
         # Check if data spans multiple days
-        date_span = (energy_data.date_until - energy_data.date_from).days
+        date_span = (date_until_utc - date_from_utc).days
         if date_span > 1:
             logger.info(f"Data spans {date_span} days, using backfill")
             return True
         
         # Check if data is older than 24 hours
-        hours_old = (datetime.now() - energy_data.date_until).total_seconds() / 3600
+        hours_old = (now_utc - date_until_utc).total_seconds() / 3600
         if hours_old > 24:
             logger.info(f"Data is {hours_old:.1f} hours old, using backfill")
             return True
