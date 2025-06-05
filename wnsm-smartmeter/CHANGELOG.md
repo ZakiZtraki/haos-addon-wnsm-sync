@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.39](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.38...v0.3.39) (2025-06-04)
+
+
+### Features
+
+* **ha-backfill:** implementation of the ha-backfill into the addon ([f922d51](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/f922d510d0e87e09feeac45beba08bf8aa86217b))
+
 ### [0.3.38](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.37...v0.3.38) (2025-06-04)
 
 
