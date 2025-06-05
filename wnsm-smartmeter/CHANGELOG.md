@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.46](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.45...v0.3.46) (2025-06-05)
+
+
+### Features
+
+* add timestamp normalization to UTC in PythonBackfill ([f2840d6](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/f2840d65cc6cd469a068bc9c5df131d7e1c115c0))
+
 ### [0.3.45](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.44...v0.3.45) (2025-06-05)
 
 ### [0.3.44](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.43...v0.3.44) (2025-06-05)
