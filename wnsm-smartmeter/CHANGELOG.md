@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.44](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.43...v0.3.44) (2025-06-05)
+
+
+### Features
+
+* enhance logging for database queries and auto-detection in PythonBackfill ([e818add](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/e818addfa28fba27e327f922bc5e601b4d72587e))
+
 ### [0.3.43](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.42...v0.3.43) (2025-06-05)
 
 ### [0.3.42](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.41...v0.3.42) (2025-06-05)
