@@ -14,6 +14,24 @@ from .csv_exporter import CSVExporter, CumulativeReading
 logger = logging.getLogger(__name__)
 
 
+def normalize_timestamp_to_utc(timestamp: datetime) -> datetime:
+    """Normalize a timestamp to timezone-naive UTC.
+    
+    Args:
+        timestamp: Input timestamp (timezone-aware or naive)
+        
+    Returns:
+        Timezone-naive UTC datetime
+    """
+    if timestamp.tzinfo is not None:
+        # Convert timezone-aware to UTC and remove timezone info
+        utc_timestamp = timestamp.utctimetuple()
+        return datetime(*utc_timestamp[:6])
+    else:
+        # Already timezone-naive, assume it's UTC
+        return timestamp
+
+
 class PythonBackfill:
     """Pure Python implementation of backfill functionality.
     
@@ -149,8 +167,10 @@ class PythonBackfill:
             
             # Get time range for deletion
             if readings:
-                start_time = min(r.timestamp for r in readings)
-                end_time = max(r.timestamp for r in readings)
+                # Normalize all timestamps to timezone-naive UTC for comparison
+                normalized_timestamps = [normalize_timestamp_to_utc(r.timestamp) for r in readings]
+                start_time = min(normalized_timestamps)
+                end_time = max(normalized_timestamps)
                 
                 # Delete existing records in the time range
                 self._delete_existing_records(cursor, start_time, end_time)
@@ -212,8 +232,8 @@ class PythonBackfill:
         short_term_cutoff = datetime.now() - timedelta(days=self.short_term_days)
         
         for reading in readings:
-            # Convert to UTC
-            utc_time = reading.timestamp
+            # Normalize timestamp to timezone-naive UTC
+            utc_time = normalize_timestamp_to_utc(reading.timestamp)
             
             # Insert into long-term statistics (hourly data)
             if utc_time.minute == 0:  # Only on the hour
