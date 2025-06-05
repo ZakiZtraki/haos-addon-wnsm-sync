@@ -273,11 +273,14 @@ class PythonBackfill:
         Returns:
             Dictionary with sensor information
         """
+        logger.debug("--- Querying Database for All Energy Sensors ---")
         try:
+            logger.debug(f"Connecting to database: {self.ha_database_path}")
             conn = sqlite3.connect(self.ha_database_path)
             cursor = conn.cursor()
             
             # Query statistics_meta table for energy sensors
+            logger.debug("Executing query for all kWh sensors...")
             cursor.execute("""
                 SELECT id, statistic_id, source, unit_of_measurement, name
                 FROM statistics_meta
@@ -285,15 +288,20 @@ class PythonBackfill:
                 ORDER BY statistic_id
             """)
             
+            rows = cursor.fetchall()
+            logger.debug(f"Query returned {len(rows)} rows")
+            
             sensors = []
-            for row in cursor.fetchall():
-                sensors.append({
+            for row in rows:
+                sensor_data = {
                     'metadata_id': row[0],
                     'statistic_id': row[1],
                     'source': row[2],
                     'unit': row[3],
                     'name': row[4]
-                })
+                }
+                sensors.append(sensor_data)
+                logger.debug(f"Found sensor: {sensor_data}")
             
             conn.close()
             
@@ -301,6 +309,7 @@ class PythonBackfill:
             for sensor in sensors:
                 logger.info(f"  ID: {sensor['metadata_id']}, Entity: {sensor['statistic_id']}")
             
+            logger.debug("--- Database Query Complete ---")
             return {'sensors': sensors}
             
         except Exception as e:
@@ -315,9 +324,13 @@ class PythonBackfill:
         Returns:
             Metadata ID if found, None otherwise
         """
+        logger.debug("--- Starting Auto-Detection ---")
         try:
             # Get the expected sensor name based on Zählpunkt
             zp_suffix = self.config.zp[-8:] if hasattr(self.config, 'zp') and self.config.zp else None
+            logger.debug(f"Zählpunkt from config: {getattr(self.config, 'zp', 'NOT_SET')}")
+            logger.debug(f"Zählpunkt suffix: {zp_suffix}")
+            
             if not zp_suffix:
                 logger.warning("No Zählpunkt configured, cannot auto-detect sensor")
                 return None
@@ -327,12 +340,16 @@ class PythonBackfill:
                 f"sensor.wnsm_daily_total_{zp_suffix}",  # Daily total sensor (preferred for backfill)
                 f"sensor.wnsm_energy_{zp_suffix}",      # 15min energy sensor (alternative)
             ]
+            logger.debug(f"Expected sensor names: {expected_sensors}")
             
+            logger.debug("Connecting to Home Assistant database for auto-detection...")
             conn = sqlite3.connect(self.ha_database_path)
             cursor = conn.cursor()
             
             # Look for our sensors in the statistics_meta table
+            logger.debug("Searching for expected sensors in statistics_meta table...")
             for sensor_id in expected_sensors:
+                logger.debug(f"Looking for sensor: {sensor_id}")
                 cursor.execute("""
                     SELECT id, statistic_id, source, unit_of_measurement, name
                     FROM statistics_meta
@@ -343,19 +360,26 @@ class PythonBackfill:
                 if result:
                     metadata_id = str(result[0])
                     logger.info(f"Auto-detected WNSM sensor: {sensor_id} (metadata_id: {metadata_id})")
+                    logger.debug("--- Auto-Detection Successful ---")
                     conn.close()
                     return metadata_id
+                else:
+                    logger.debug(f"Sensor {sensor_id} not found in database")
             
             conn.close()
             
             # If not found, log available sensors for debugging
             logger.warning(f"Could not auto-detect WNSM sensor. Expected one of: {expected_sensors}")
+            logger.debug("Getting list of all available sensors for debugging...")
             sensor_info = self.get_sensor_metadata_ids()
             if sensor_info.get('sensors'):
                 logger.info("Available energy sensors:")
                 for sensor in sensor_info['sensors']:
                     logger.info(f"  {sensor['statistic_id']} (ID: {sensor['metadata_id']})")
+            else:
+                logger.warning("No energy sensors found in database at all!")
             
+            logger.debug("--- Auto-Detection Failed ---")
             return None
             
         except Exception as e:
