@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from wnsm_sync.config.loader import ConfigLoader
 from wnsm_sync.config.secrets import SecretsManager
-from wnsm_sync.backfill.ha_backfill import HABackfillIntegration
+from wnsm_sync.backfill.python_backfill import PythonBackfill
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ def test_backfill_setup(config_path: str) -> None:
         config = load_test_config(config_path)
         
         # Initialize backfill integration
-        backfill = HABackfillIntegration(config)
+        backfill = PythonBackfill(config)
         
         # Run diagnostic tests
         logger.info("Testing backfill setup...")
@@ -215,12 +215,12 @@ def run_test_backfill(config_path: str) -> None:
         config.history_days = 2  # Generate 2 days of test data
         
         # Initialize backfill integration
-        backfill = HABackfillIntegration(config)
+        backfill = PythonBackfill(config)
         
         logger.info("Generating test data and running Python backfill...")
         
         # Generate test data using Python backfill
-        energy_data = backfill.python_backfill.create_test_data(days=2)
+        energy_data = backfill.create_test_data(days=2)
         
         logger.info(f"Generated {len(energy_data.readings)} test readings")
         

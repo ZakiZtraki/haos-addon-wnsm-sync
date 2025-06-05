@@ -11,7 +11,7 @@ from ..data.processor import DataProcessor
 from ..data.models import EnergyData
 from ..mqtt.client import MQTTClient
 from ..mqtt.discovery import HomeAssistantDiscovery
-from ..backfill.ha_backfill import HABackfillIntegration
+from ..backfill.python_backfill import PythonBackfill
 from .utils import with_retry, SessionManager
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ class WNSMSync:
         self.data_processor = DataProcessor()
         self.mqtt_client = MQTTClient(config)
         self.discovery = HomeAssistantDiscovery(config)
-        self.backfill_integration = HABackfillIntegration(config)
+        self.backfill_integration = PythonBackfill(config)
         self._api_client: Optional[Smartmeter] = None
     
     @property
