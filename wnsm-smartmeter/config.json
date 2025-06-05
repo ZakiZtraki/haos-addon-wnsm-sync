@@ -1,6 +1,6 @@
 {
     "name": "Wiener Netze Smartmeter Sync",
-    "version": "0.3.42",
+    "version": "0.3.43",
     "slug": "wnsm_smartmeter",
     "description": "Integration for Wiener Netze Smart Meter that fetches 15-min consumption data and pushes to Home Assistant statistics.",
     "url": "https://github.com/ZakiZtraki/haos-addon-wnsm-sync",
