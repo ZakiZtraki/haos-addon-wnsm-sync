@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.41](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.40...v0.3.41) (2025-06-05)
+
+
+### Bug Fixes
+
+* update BACKFILL_GUIDE and MQTT discovery to ensure correct entity IDs for sensors ([e9f451e](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/e9f451e447fb8ee8c1f46ba6ad69bb1fffbad29c))
+
 ### [0.3.40](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.39...v0.3.40) (2025-06-05)
 
 
