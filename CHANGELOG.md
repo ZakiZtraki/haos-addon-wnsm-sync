@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.49](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.4.0...v0.3.49) (2026-02-24)
+
 ### [0.3.48](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.46...v0.3.48) (2025-06-05)
 
 
