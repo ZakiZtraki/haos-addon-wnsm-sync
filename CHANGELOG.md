@@ -2,7 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [0.3.49](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.4.0...v0.3.49) (2026-02-24)
+## [0.4.1](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.4.0...v0.4.1) (2026-02-24)
+
+### Bug Fixes
+
+* correct OAuth2 token URL from `log.wien` to `api.wstw.at/invoke/pub.apigateway.oauth2/getAccessToken` ([edc8779](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/edc8779))
+* add required `scope=profile` to client credentials token request
+
+## [0.4.0](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.48...v0.4.0) (2026-02-24)
+
+### ⚠ BREAKING CHANGES
+
+* Configuration keys changed: `WNSM_USERNAME` → `CLIENT_ID`, `WNSM_PASSWORD` → `CLIENT_SECRET`, new `API_KEY` required. Update your add-on configuration after upgrading.
+
+### Features
+
+* replace vienna-smartmeter library with direct WN Smart Meter REST API calls ([a821e54](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/commit/a821e54))
+* OAuth2 client credentials flow — no browser, no PKCE, no session files
+* new `MeasurementPoint` model with `value_kwh`, `timestamp`, `obis_code`, `quality`
+* Wh→kWh conversion and UTC timestamp normalisation in data processor
+* MQTT payload includes OBIS code and quality fields
+* 46 unit tests covering API client, config, data processor, and MQTT
+
+### Bug Fixes
+
+* remove dependency on `lxml`, `PyYAML`, `python-dateutil` (requirements now: `requests`, `paho-mqtt`)
+
+### Chores
+
+* delete backfill module, secrets manager, all guide/debug docs, root-level test scripts, node tooling
+* clean up stale root-level markdown files and `old_structure_backup`
 
 ### [0.3.48](https://github.com/ZakiZtraki/haos-addon-wnsm-sync/compare/v0.3.46...v0.3.48) (2025-06-05)
 

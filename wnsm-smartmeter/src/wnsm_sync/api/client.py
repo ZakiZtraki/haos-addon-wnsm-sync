@@ -42,6 +42,7 @@ class WNSMApiClient:
             "grant_type": "client_credentials",
             "client_id": self.client_id,
             "client_secret": self.client_secret,
+            "scope": const.TOKEN_SCOPE,
         }
         try:
             response = self._session.post(
